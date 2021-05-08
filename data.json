@@ -1,0 +1,40 @@
+{
+    "classroomLinks": {
+        "VLSI": "https://classroom.google.com/c/MzEyMzAwMjgxMDIz",
+        "MPMC": "https://classroom.google.com/c/MzEyNDc1OTYxMjc3",
+        "MWE": "https://classroom.google.com/c/MzEyNjA3MjUwOTI1",
+        "DC": "https://classroom.google.com/c/MzA5OTc3NDkxMTU0",
+        "CN": "https://classroom.google.com/c/MzEyODUyMzY5Mzk4",
+        "JAVA": "https://classroom.google.com/c/MzEyMjgwNzM4NDA2",
+        "OOPSLAB": "https://classroom.google.com/c/MzEyMjg2NzQ5Nzc1",
+        "PDSS": "https://classroom.google.com/c/MzEzMDA0MzMzODQz",
+        "R&A": "https://classroom.google.com/c/MTI2NTM4NzY2NjMx",
+        "TEST": "https://classroom.google.com/c/MzM1OTAwMDE3Mzc2"
+    },
+    "credentials": {
+        "mailAddress": "",
+        "password": ""
+    },
+    "dir": {
+        "pathToChromeDriver": "/home/koteshrv/.local/bin/chromedriver",
+        "profilePath": "/home/koteshrv/.config/google-chrome/Profile 1",
+        "classTimeTableLocation": "/home/koteshrv/Desktop/Google-Meet-Bot/TimeTable.xlsx"
+    },
+    "otherData": {
+        "alertWords": [
+            "koteswararao",
+            "hod",
+            "454",
+            "attendance",
+            "respond"
+        ],
+        "minCountToJoin": 0,
+        "minCountToLeave": 2,
+        "soundFrequency": 30,
+        "responseMessage": "present sir",
+        "linkPostedSeperatelyInAnnouncementTab": [
+            "R&A",
+            "TEST"
+        ]
+    }
+}

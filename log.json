@@ -1,0 +1,71 @@
+{
+    "holidaysList": {
+        "9": "Sunday"
+    },
+    "completeTimeTable": {
+        "Timings": [
+            "09:00 - 10:00",
+            "10:00 - 11:00",
+            "11:00 - 12:00",
+            "12:00 - 13:00",
+            "13:00 - 14:00",
+            "14:00 - 15:00",
+            "15:00 - 17:00"
+        ],
+        "Monday": [
+            "DC",
+            "CN",
+            "Java",
+            "Lunch",
+            "MWE",
+            "VLSI"
+        ],
+        "Tuesday": [
+            "VLSI",
+            "MPMC",
+            "MWE",
+            "Lunch",
+            "CN",
+            "DC",
+            "R&A"
+        ],
+        "Wednesday": [
+            "CN",
+            "Java",
+            "MPMC",
+            "Lunch",
+            "VLSI",
+            "DC"
+        ],
+        "Thursday": [
+            "MPMC",
+            "CN",
+            "Java",
+            "Lunch",
+            "PDSS",
+            "PDSS",
+            "R&A"
+        ],
+        "Friday": [
+            "MWE",
+            "MPMC",
+            "DC",
+            "Lunch",
+            "OOPSLAB",
+            "OOPSLAB"
+        ],
+        "Saturday": [
+            "VLSI",
+            "MWE",
+            "Java"
+        ]
+    },
+    "todaysTimeTable": {
+        "09:00 - 10:00": "DC",
+        "10:00 - 11:00": "CN",
+        "11:00 - 12:00": "Java",
+        "12:00 - 13:00": "Lunch",
+        "13:00 - 14:00": "MWE",
+        "14:00 - 15:00": "VLSI"
+    }
+}

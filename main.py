@@ -13,7 +13,6 @@ if argLen == 1:
 	driver = loadDriver()
 	joinClass(classNow, driver)
 	print('Left ' + classNow + ' class')
-
 	driver.quit()
 
 
@@ -32,22 +31,28 @@ if argLen == 1:
 
 		classNow = whichClass()
 
-		if(classNow == None) :
-			print('No ongoing classes at the moment')
+		
 		else :
 			driver = loadDriver()
 			totalClassesToday = len(findClasses())
-			print('class count ', totalClassesToday)
+			usedPrintInSameLine = False
 
 			for i in range(totalClassesToday):
+				if usedPrintInSameLine:
+					printInSameLine(newLine = True)
 				classNow = whichClass()
+				if(classNow == None) :
+					print('No ongoing classes at the moment')
 				while True:
 					if(classNow == None) :
-						print('No ongoing classes at the moment')
-						time.sleep(30)
+						printInSameLine(str1 = 'Waiting for Todays link'. Trying again in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = 30)
+						usedPrintInSameLine = True
+						#time.sleep(30)
 					else :
 						break
 					classNow = whichClass()
+				if usedPrintInSameLine:
+					printInSameLine(newLine = True)
 				print(classNow + ' is going on at the moment')
 				print('Trying to join ' + classNow + ' class')
 				joinClass(classNow, driver)

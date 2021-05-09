@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from rich.console import Console
+from rich.table import Table
 from selenium import webdriver
 from datetime import datetime
 from art import *
@@ -157,6 +158,8 @@ def classesToday():
 	dateAndTime = datetime.now()
 	day = dateAndTime.day
 	weekDay = dateAndTime.today().strftime('%A')
+	weekDay = "Thursday"
+	day = 15
 	classes = []
 	classtime = []
 	if str(day) in holidays:
@@ -186,12 +189,25 @@ def classesToday():
 	print('\t' + toBold('Current time: ') + toBold(str(currentTime))[:12])
 	time = str(currentTime).split(":")
 
+	table = Table(title="Today's Time Table", show_lines=True)
+
+	table.add_column("Timings", justify = "center", style = "cyan", no_wrap = True)
+	table.add_column("Class", justify = "center", style = "green")
+	table.add_column("Status", justify = "center", style = "magenta")
+	
+
+	classFlag = False
 	for i in range(len(classtime)):
-		if (time[0] >= classtime[i][0:2] and time[1] >= classtime[i][3:5]) and (time[0] < classtime[i][8:10] and time[1] <= '59'): #i[14:16]
-			print('\n' + '\t' + toBold(classtime[i]) + ' ' + toBold(classes[i]))
+		if (time[0] >= classtime[i][0:2] and time[1] >= classtime[i][3:5]) and (time[0] < classtime[i][8:10] and time[1] <= '59'): 
+			table.add_row(classtime[i], classes[i], "[bold magenta] ONGOING [green]:hourglass:")
+			classFlag = True
 		else:
-			print('\n' + '\t' + classtime[i] + ' ' + classes[i])
-	print('\n')
+			if classFlag == True:
+				table.add_row(classtime[i], classes[i])
+			else :
+				table.add_row(classtime[i], classes[i], "[bold magenta]COMPLETED [green]:heavy_check_mark:")
+
+	console.print(table)
 
 
 def whichClass() :

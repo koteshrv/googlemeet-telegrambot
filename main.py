@@ -63,7 +63,7 @@ elif argLen == 2:
 	arg = sys.argv[1].lower()
 
 	if arg == '--t':
-		classesToday()
+		classesToday(printTable = True)
 
 	elif arg == '--h':
 		displayHolidaysList()
@@ -72,7 +72,7 @@ elif argLen == 2:
 		helpFunction()
 
 	else :
-		print('Wrong argument ', 'check "--help" for help')
+		print(arg + " is not a command. See main.py --help")
 
 elif argLen == 3:
 	arg1 = sys.argv[1].lower()
@@ -94,6 +94,9 @@ elif argLen == 3:
 		displayTimeTable()
 
 	else :
-		print('Wrong argument ', 'add "--help" for help')			
+		if arg1 == '--h' or arg1 == '--t':
+			print(arg2 + " is not a command. See main.py --help")	
+		else :
+			print("main.py " + arg1 + " " + arg2 + " is not a command. See main.py --help")		
 
 	

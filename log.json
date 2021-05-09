@@ -1,7 +1,5 @@
 {
-    "holidaysList": {
-        "9": "Sunday"
-    },
+    "holidaysList": {},
     "completeTimeTable": {
         "Timings": [
             "09:00 - 10:00",
@@ -60,6 +58,13 @@
             "Java"
         ]
     },
-    "todaysTimeTable": {},
+    "todaysTimeTable": {
+        "09:00 - 10:00": "DC",
+        "10:00 - 11:00": "CN",
+        "11:00 - 12:00": "Java",
+        "12:00 - 13:00": "Lunch",
+        "13:00 - 14:00": "MWE",
+        "14:00 - 15:00": "VLSI"
+    },
     "log": {}
 }

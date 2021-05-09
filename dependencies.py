@@ -111,13 +111,12 @@ def isSecondSaturday():
 
 def updateholidaysList(key = None, value = None, remove = False):
 	jsonData = fetchDataFromJSON('log.json')
+	holidaysDict = jsonData["holidaysList"]
 	if remove:
-		holidaysDict = jsonData["holidaysList"]
 		del holidaysDict[key]
 		console.print('Deleted '+ key + ' from holidays list successfully', style = "gold3")
 
 	else :
-		holidaysDict = {}
 		dateAndTime = datetime.now()
 		day = dateAndTime.day
 		secondSaturday = isSecondSaturday()
@@ -154,10 +153,10 @@ def loadTimeTable():
 	jsonData["completeTimeTable"].update(completeTimeTable)
 	sendDataToJSON('log.json', jsonData)
 
+	classesToday()
 
 
-def classesToday():
-	loadTimeTable()
+def classesToday(printTable = False):
 	date = findDay()
 	classes = []
 	updateholidaysList()
@@ -171,7 +170,6 @@ def classesToday():
 		console.print("\n\tToday is a holiday due to ", style = "bold cyan", end = '')
 		console.print(holidays[str(day)] + '\n', style = "bold yellow")
 	else:
-		print(text2art("Today's Schedule", font = "small"))
 		classes = []
 		classtime = []
 		classesToday = jsonData["completeTimeTable"][weekDay]
@@ -194,29 +192,31 @@ def classesToday():
 		jsonData["todaysTimeTable"] = t
 		sendDataToJSON('log.json', jsonData)
 
-		currentTime = dateAndTime.time()
-		print('\t' + toBold('Current time: ') + toBold(str(currentTime))[:12])
-		time = str(currentTime).split(":")
+		if printTable:
+			
+			print(text2art("Classes today", font = "small"))
+			currentTime = dateAndTime.time()
+			time = str(currentTime).split(":")
 
-		table = Table(title="Today's Time Table", show_lines=True)
+			table = Table(show_lines=True)
 
-		table.add_column("Timings", justify = "center", style = "cyan", no_wrap = True)
-		table.add_column("Class", justify = "center", style = "green")
-		table.add_column("Status", justify = "center", style = "magenta")
-		
+			table.add_column("Timings", justify = "center", style = "cyan", no_wrap = True)
+			table.add_column("Class", justify = "center", style = "green")
+			table.add_column("Status", justify = "center", style = "magenta")
+			
 
-		classFlag = False
-		for i in range(len(classtime)):
-			if (time[0] >= classtime[i][0:2] and time[1] >= classtime[i][3:5]) and (time[0] < classtime[i][8:10] and time[1] <= '59'): 
-				table.add_row(classtime[i], classes[i], "[bold magenta] ONGOING [green]:hourglass:")
-				classFlag = True
-			else:
-				if classFlag == True:
-					table.add_row(classtime[i], classes[i])
-				else :
-					table.add_row(classtime[i], classes[i], "[bold magenta]COMPLETED [green]:heavy_check_mark:")
+			classFlag = False
+			for i in range(len(classtime)):
+				if (time[0] >= classtime[i][0:2] and time[1] >= classtime[i][3:5]) and (time[0] < classtime[i][8:10] and time[1] <= '59'): 
+					table.add_row(classtime[i], classes[i], "[bold magenta] ONGOING [green]:hourglass:")
+					classFlag = True
+				else:
+					if classFlag == True:
+						table.add_row(classtime[i], classes[i])
+					else :
+						table.add_row(classtime[i], classes[i], "[bold magenta]COMPLETED [green]:heavy_check_mark:")
 
-		console.print(table)
+			console.print(table)
 
 def displayTimeTable():
 	print(text2art("Time Table", font = "small"))
@@ -225,7 +225,6 @@ def displayTimeTable():
 	t = jsonData["completeTimeTable"]
 	dateAndTime = datetime.now()
 	weekDay = dateAndTime.today().strftime('%A')
-	weekDay = "Thursday"
 	table = Table(show_lines=True)
 
 	timetableKeys = list(t.keys())
@@ -251,12 +250,30 @@ def displayHolidaysList():
 	table = Table(title = "[blink2 bold dodger_blue1]Holidays List", show_lines=True)
 	table.add_column("[dark_orange]Date", justify = "center", style = "yellow3", no_wrap = True)
 	table.add_column("[dark_orange]Occasion", justify = "center", style = "yellow3", no_wrap = True)
+	holidaysFlag = False
 	for key in holidayListKeys:
 		value = data["holidaysList"][key]
 		l = [key, value]
 		table.add_row(*l)
+		holidaysFlag = True
 
+	if holidaysFlag:
+		console.print(table)
+	else :
+		console.print("You dont have any holidays", style = "bold gold1")
+
+def helpFunction():
+	table = Table(show_lines=True)
+	table.add_column("Arguments", justify = "center", style = "yellow3", no_wrap = True)
+	table.add_column("Details", justify = "center", style = "yellow3")
+	table.add_row("no arguments", "runs the main program")
+	table.add_row("--t", "displays todays timetable")
+	table.add_row("--h", "displays holidays list")
+	table.add_row("--h -a", "add new holiday to the list and prints")
+	table.add_row("--h -r", "removes holiday from the list and prints")
+	table.add_row("--t -f", "displays complete timetable fetched from excel sheet")
 	console.print(table)
+
 
 def whichClass() :
 	loadTimeTable()
@@ -344,13 +361,12 @@ def joinClass(subject, driver):
 				classURL = re.search("(?P<url>https?://[^\s]+)", classData).group("url")
 				print('classURL ', str(classURL))
 				if classURL[:24] == 'https://meet.google.com/':
-					print('Fetched ', classURL, 'from the google classroom')
+					print('Fetched ', classURL +'from the google classroom')
 					print('Opening ', classURL)
 					driver.get(classURL)
-					printInSameLine(sleepTime = 5)
-					print('Opened meet link')
-					#printInSameLine(str1 = 'Loading', sleepTime = 5)
 					richStatus(sleepTime = 5)
+					print('Opened meet link')
+					richStatus(sleepTime = 10)
 					break
 			except AttributeError:
 				print('Meet link not available to fetch.')
@@ -497,9 +513,7 @@ def login():
 	console.print('Turned off Microphone', style = "bold red")
 	print('Turned off Pop-up')
 
-	
-
-	print('Logging into ' + toBold('Google account')
+	print('Logging into ' + toBold('Google account'))
 	driver.get('https://classroom.google.com/?emr=0')
 	time.sleep(3)
 
@@ -526,18 +540,5 @@ def login():
 	print('Login Successful')
 
 	return driver
-
-
-def helpFunction():
-	table = Table(show_lines=True)
-	table.add_column("Arguments", justify = "center", style = "yellow3", no_wrap = True)
-	table.add_column("Details", justify = "center", style = "yellow3")
-	table.add_row("no arguments", "runs the main program")
-	table.add_row("--t", "displays todays timetable")
-	table.add_row("--h", "displays holidays list")
-	table.add_row("--h -a", "add new holiday to the list and prints")
-	table.add_row("--h -r", "removes holiday from the list and prints")
-	table.add_row("--t -f", "displays complete timetable fetched from excel sheet")
-	console.print(table)
 
 		

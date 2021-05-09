@@ -18,7 +18,7 @@
     "dir": {
         "pathToChromeDriver": "/home/koteshrv/.local/bin/chromedriver",
         "profilePath": "/home/koteshrv/.config/google-chrome/Profile 1",
-        "classTimeTableLocation": "/home/koteshrv/Desktop/Google-Meet-Bot/TimeTable.xlsx"
+        "classTimeTableLocation": "/home/koteshrv/Desktop/Google-Meet-Automation/TimeTable.xlsx"
     },
     "otherData": {
         "alertWords": [

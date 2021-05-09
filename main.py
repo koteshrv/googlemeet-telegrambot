@@ -8,56 +8,73 @@ import sys
 argLen = len(sys.argv)
 
 if argLen == 1:
+
+
 	print(text2art("Google Meet Bot", font = "small"))
-	classNow = 'TEST'
-	driver = loadDriver()
-	joinClass(classNow, driver)
-	print('Left ' + classNow + ' class')
-	driver.quit()
 
-
-	'''
 	dateAndTime = datetime.now()
 	day = dateAndTime.day
 	noClasses = False
-	for holidayDate in holidayList:
+	updateholidaysList()
+	jsonData = fetchDataFromJSON('log.json')
+	holidaysDict = jsonData["holidaysList"]
+	classesToday = jsonData["todaysTimeTable"]
+	for holidayDate in holidaysDict:
 		if day == holidayDate:
 			console.print('No classes today due to '+ holidaysDict[holidayDate], style = "bold red")
 			console.print('[bold][green]' + 'Done\n')
 			noClasses = True
 
+	classesList = []
+	for timings in classesToday:
+		classesList.append(timings + ' '+ classesToday[timings])
+
 
 	if not noClasses:
 
 		classNow = whichClass()
+		while classNow == None:
+			printInSameLine(str1 = 'No class at the moment. Will trying again in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = 60, color = "bold red")
 		
-		else :
-			driver = loadDriver()
-			totalClassesToday = len(findClasses())
-			usedPrintInSameLine = False
+		driver = loadDriver()
 
-			for i in range(totalClassesToday):
-				if usedPrintInSameLine:
-					printInSameLine(newLine = True)
+		totalClassesToday = len(classesList)
+		usedPrintInSameLine = False
+
+		for i in range(totalClassesToday):
+			if usedPrintInSameLine:
+				printInSameLine(newLine = True)
+			classNow = whichClass()
+			if(classNow == None) :
+				print('No ongoing classes at the moment')
+			
+			classAlreadyAttended = False
+
+			while True:
+				log = fetchDataFromJSON('log.json')
+				joiningLeavingTime = log["log"]["joiningLeavingTime"]
+				if classNow in joiningLeavingTime and joiningLeavingTime[classNow]["joining time"][:2] == str(datetime.now().time())[:2]:
+					classAlreadyAttended = True
+				if classNow == None :
+					printInSameLine(str1 = 'Waiting for Todays link. Trying again in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = 30)
+					usedPrintInSameLine = True
+					#time.sleep(30)
+				elif classAlreadyAttended:
+					printInSameLine(str1 = classNow + ' class already attended. Trying again in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = 30)
+					usedPrintInSameLine = True
+				else :
+					break
 				classNow = whichClass()
-				if(classNow == None) :
-					print('No ongoing classes at the moment')
-				while True:
-					if(classNow == None) :
-						printInSameLine(str1 = 'Waiting for Todays link'. Trying again in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = 30)
-						usedPrintInSameLine = True
-						#time.sleep(30)
-					else :
-						break
-					classNow = whichClass()
-				if usedPrintInSameLine:
-					printInSameLine(newLine = True)
-				print(classNow + ' is going on at the moment')
-				print('Trying to join ' + classNow + ' class')
-				joinClass(classNow, driver)
-				print('Left ' + classNow + ' class')
+			if usedPrintInSameLine:
+				printInSameLine(newLine = True)
+			print(classNow + ' is going on at the moment')
+			print('Trying to join ' + classNow + ' class')
+			joinClass(classNow, driver)
+			print('Left ' + classNow + ' class')
+		
+		driver.quit()
 
-	'''
+
 
 elif argLen == 2:
 	arg = sys.argv[1].lower()

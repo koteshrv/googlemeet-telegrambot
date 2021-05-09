@@ -27,6 +27,7 @@ def sendDataToJSON(fileName, data):
 		json.dump(data, file, indent = 4)
 
 data = fetchDataFromJSON('data.json')
+
 profilePath = data['dir']['profilePath']
 
 console = Console()
@@ -71,7 +72,7 @@ def richStatus(text = 'Loading...', sleepTime = 10, spinnerType = 'dots', status
 		time.sleep(sleepTime)
 	console.print('[bold][green]' + statusMessage)
 
-def printInSameLine(str1 = 'Loading', str2 = '.', sleepTime = 10, isChar = True, newLine = False, seconds = False):
+def printInSameLine(str1 = 'Loading', str2 = '.', sleepTime = 10, isChar = True, newLine = False, seconds = False, color = "bold green"):
 	if newLine:
 		print()
 		return
@@ -80,7 +81,7 @@ def printInSameLine(str1 = 'Loading', str2 = '.', sleepTime = 10, isChar = True,
 	for x in range (0, int(sleepTime) + 1): 
 		b = str1 + (str(sec - x) if seconds else '') +  str(str2) * (x if isChar else 1)
 		print(s, end = '\r')
-		console.print(b, end = '\r', style = "bold green")
+		console.print(b, end = '\r', style = color)
 		if sleepTime > 0:
 			time.sleep(1)
 		s = ' ' * len(b) 
@@ -149,6 +150,7 @@ def loadTimeTable():
 				rowValues.append(cellValue.value)
 		completeTimeTable[keyValue.value] = rowValues
 
+
 	jsonData = fetchDataFromJSON('log.json')
 	jsonData["completeTimeTable"].update(completeTimeTable)
 	sendDataToJSON('log.json', jsonData)
@@ -194,7 +196,6 @@ def classesToday(printTable = False):
 
 		if printTable:
 			
-			print(text2art("Classes today", font = "small"))
 			currentTime = dateAndTime.time()
 			time = str(currentTime).split(":")
 
@@ -203,11 +204,13 @@ def classesToday(printTable = False):
 			table.add_column("Timings", justify = "center", style = "cyan", no_wrap = True)
 			table.add_column("Class", justify = "center", style = "green")
 			table.add_column("Status", justify = "center", style = "magenta")
-			
 
 			classFlag = False
 			for i in range(len(classtime)):
-				if (time[0] >= classtime[i][0:2] and time[1] >= classtime[i][3:5]) and (time[0] < classtime[i][8:10] and time[1] <= '59'): 
+
+				if time[0] < classtime[i][0:2]:
+					table.add_row(classtime[i], classes[i], "[bold magenta] Scheduled [green]:hourglass:")
+				elif (time[0] >= classtime[i][0:2] and time[1] >= classtime[i][3:5]) and (time[0] < classtime[i][8:10] and time[1] <= '59'): 
 					table.add_row(classtime[i], classes[i], "[bold magenta] ONGOING [green]:hourglass:")
 					classFlag = True
 				else:
@@ -219,7 +222,6 @@ def classesToday(printTable = False):
 			console.print(table)
 
 def displayTimeTable():
-	print(text2art("Time Table", font = "small"))
 	loadTimeTable()
 	jsonData = fetchDataFromJSON('log.json')
 	t = jsonData["completeTimeTable"]
@@ -283,7 +285,7 @@ def whichClass() :
 		time = datetime.now().time()
 		time = str(time).split(":")
 		if (time[0] >= i[0:2] and time[1] >= i[3:5]) and (time[0] < i[8:10] and time[1] <= '59'):
-			return i[17:]		
+			return subjects[i]		
 
 	return None
 
@@ -303,13 +305,14 @@ def membersAlreadyJoinedCount(text):
 
 
 def joinClass(subject, driver):
+	log = {}
 	subject = subject.upper()
 	url = data['classroomLinks'][subject]
 	print('Opening ' + subject + ' classroom in new tab' )
 	driver.execute_script("window.open('');")
+	WebDriverWait(driver, 5).until(EC.number_of_windows_to_be(2))
 	driver.switch_to.window(driver.window_handles[1])
 	driver.get(url)
-	#printInSameLine(sleepTime = 5) #prints loading line by default
 	richStatus(sleepTime = 5)
 	print('Waiting for Google Meet link for ' + subject + ' class')
 
@@ -336,7 +339,7 @@ def joinClass(subject, driver):
 				if usedPrintInSameLine == True:
 					printInSameLine(newLine = True)
 				if (classURL[:24] == 'https://meet.google.com/') :
-					print('Fetched ', classURL, 'from the google classroom')
+					print('Fetched ', classURL, ' from the google classroom')
 					print('Opening ', classURL)
 					driver.get(classURL)
 					#printInSameLine(sleepTime = 5)
@@ -359,14 +362,12 @@ def joinClass(subject, driver):
 					printInSameLine(newLine = True)
 				classData = driver.find_element_by_class_name(meetLinkClass).text
 				classURL = re.search("(?P<url>https?://[^\s]+)", classData).group("url")
-				print('classURL ', str(classURL))
 				if classURL[:24] == 'https://meet.google.com/':
-					print('Fetched ', classURL +'from the google classroom')
+					print('Fetched ', classURL +' from the google classroom')
 					print('Opening ', classURL)
 					driver.get(classURL)
-					richStatus(sleepTime = 5)
 					print('Opened meet link')
-					richStatus(sleepTime = 10)
+					richStatus(sleepTime = 5)
 					break
 			except AttributeError:
 				print('Meet link not available to fetch.')
@@ -410,7 +411,18 @@ def joinClass(subject, driver):
 
 	# clicks join button
 	print('Pressing join button')
-	join=driver.find_element_by_xpath(joinButtonXPath).click()
+	join = driver.find_element_by_xpath(joinButtonXPath).click()
+
+	joiningLeavingTimeDict = {}
+	joiningLeavingTimeDict["joining time"] = str(datetime.now().time())
+	if subject in log:
+		log[subject].update(joiningLeavingTimeDict)
+	else :
+		log[subject] = joiningLeavingTimeDict
+
+	logData = fetchDataFromJSON('log.json')
+	logData["log"]["joiningLeavingTime"].update(log)
+	sendDataToJSON('log.json', logData)
 	time.sleep(3)
 
 
@@ -425,6 +437,8 @@ def joinClass(subject, driver):
 	flag = False
 	minCountToLeave = data['otherData']['minCountToLeave']
 	alertWords = data['otherData']['alertWords']
+
+	logData = fetchDataFromJSON('log.json')
 
 	# Reads the text from captions until str(count) > '30':
 	while True:
@@ -445,8 +459,14 @@ def joinClass(subject, driver):
 					#sendMessageInChatBox(driver, responseMessage)
 					
 			if count < str(minCountToLeave) and flag :
+				joiningLeavingTimeDict["leaving time"] = str(datetime.now().time())
+				log[subject].update(joiningLeavingTimeDict)
+				logData = fetchDataFromJSON('log.json')
+				logData["log"]["joiningLeavingTime"].update(log)
+				sendDataToJSON('log.json', logData)
 				print('\nExiting Class')
 				driver.close()
+				driver.switch_to.window(driver.window_handles[-1])
 				break
 
 
@@ -454,10 +474,18 @@ def joinClass(subject, driver):
 			if count > str(minCountToLeave):
 				flag = True
 			if count < str(minCountToLeave) and flag :
+				joiningLeavingTimeDict["leaving time"] = str(datetime.now().time())
+				log[subject].update(joiningLeavingTimeDict)
+				logData = fetchDataFromJSON('log.json')
+				logData["log"]["joiningLeavingTime"].update(log)
+				sendDataToJSON('log.json', logData)
 				console.print('\nExiting Class', style = "blink2 bold red")
 				driver.close()
+				driver.switch_to.window(driver.window_handles[-1])
 				richStatus(sleepTime = 5, statusMessage = 'Left the class')
 				break
+
+	
 
 
 def sendMessageInChatBox(driver, message):

@@ -147,7 +147,7 @@ def loadTimeTable():
 	sendDataToJSON('log.json', jsonData)
 
 
-def loadTodayClasses():
+def classesToday():
 	loadTimeTable()
 	date = findDay()
 	classes = []
@@ -157,17 +157,14 @@ def loadTodayClasses():
 	dateAndTime = datetime.now()
 	day = dateAndTime.day
 	weekDay = dateAndTime.today().strftime('%A')
-	weekDay = 'Monday'
-	day = 11
+	classes = []
+	classtime = []
 	if str(day) in holidays:
 		print("Today is a holiday due to ", holidays[str(day)])
 	else:
 		classesToday = jsonData["completeTimeTable"][weekDay]
 		timings = jsonData["completeTimeTable"]["Timings"]
 		timings = timings[:len(classesToday)]
-
-		classes = []
-		classtime = []
 
 		prevClass = ''
 
@@ -186,8 +183,8 @@ def loadTodayClasses():
 	sendDataToJSON('log.json', jsonData)
 
 	currentTime = dateAndTime.time()
-	print('\t' + toBold('Current time: ') + toBold(str(time))[:12])
-	time = str(time).split(":")
+	print('\t' + toBold('Current time: ') + toBold(str(currentTime))[:12])
+	time = str(currentTime).split(":")
 
 	for i in range(len(classtime)):
 		if (time[0] >= classtime[i][0:2] and time[1] >= classtime[i][3:5]) and (time[0] < classtime[i][8:10] and time[1] <= '59'): #i[14:16]
@@ -197,8 +194,8 @@ def loadTodayClasses():
 	print('\n')
 
 
-
 def whichClass() :
+	loadTimeTable()
 	jsonData = fetchDataFromJSON('log.json')
 	subjects = jsonData["todaysTimeTable"]
 	for i in subjects:

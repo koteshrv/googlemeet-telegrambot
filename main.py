@@ -5,37 +5,17 @@ from time import sleep
 import time
 import sys
 
+argLen = len(sys.argv)
 
-arg = sys.argv[1].lower()
-#option = sys.argv[2].lower()
-
-if arg == '--t':
-	print(text2art("Time Table", font = "small"))
-	classes_today()
-	
-
-elif arg == '--h':
-	if option == '-d':
-		holidaysList()
-		data = fetchDataFromJSON('log.json')
-		print(data["holidaysList"])
-	elif option == '-u':
-		date, occasion = input("Enter holiday and occasion: ").split()
-		holidaysList(date, occasion)
-		data = fetchDataFromJSON('log.json')
-		print(data["holidaysList"])
-
-	else :
-		print('Wrong argument ', option)
-
-	
-
-elif input == '--auto':
+if argLen == 1:
 	print(text2art("Google Meet Bot", font = "small"))
 	classNow = 'TEST'
 	driver = loadDriver()
 	joinClass(classNow, driver)
 	print('Left ' + classNow + ' class')
+
+	driver.quit()
+
 
 	'''
 	dateAndTime = datetime.now()
@@ -74,3 +54,36 @@ elif input == '--auto':
 				print('Left ' + classNow + ' class')
 
 	'''
+
+elif argLen == 2:
+	arg = sys.argv[1].lower()
+
+	if arg == '--t':
+		print(text2art("Time Table", font = "small"))
+		classesToday()
+		#print(whichClass())
+
+	elif arg == '--h':
+		holidaysList()
+		data = fetchDataFromJSON('log.json')
+		print(data["holidaysList"])
+
+	else :
+		print('Wrong argument ', arg)
+
+elif arglen == 3:
+	arg1 = sys.argv[1].lower()
+	arg2 = sys.argv[2].lower()
+
+	if arg1 == '--h' and arg2 == '-u':
+		date, occasion = input("Enter holiday and occasion: ").split()
+		holidaysList(date, occasion)
+		data = fetchDataFromJSON('log.json')
+		print(data["holidaysList"])
+
+	else :
+		print('Wrong argument ', option)
+
+			
+
+	

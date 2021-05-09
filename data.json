@@ -33,8 +33,7 @@
         "soundFrequency": 30,
         "responseMessage": "present sir",
         "linkPostedSeperatelyInAnnouncementTab": [
-            "R&A",
-            "TEST"
+            "R&A"
         ]
     }
 }

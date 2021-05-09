@@ -109,21 +109,28 @@ def isSecondSaturday():
 	return secondSaturday
 
 
-def holidaysList(key = None, value = None):
-	holidaysDict = {}
-	dateAndTime = datetime.now()
-	day = dateAndTime.day
-	secondSaturday = isSecondSaturday()
-	if secondSaturday >= day:
-		holidaysDict[str(secondSaturday)] = 'Second Saturday'
-	if findDay() == 6:
-		holidaysDict[str(day)] = 'Sunday'
-	if not (key == None and value == None):
-		holidaysDict[str(key)] = value
-	for holidayDate in list(holidaysDict):
-		if int(holidayDate) < day:
-			holidaysDict.pop(holidayDate)
+def updateholidaysList(key = None, value = None, remove = False):
 	jsonData = fetchDataFromJSON('log.json')
+	if remove:
+		holidaysDict = jsonData["holidaysList"]
+		del holidaysDict[key]
+		console.print('Deleted '+ key + ' from holidays list successfully', style = "gold3")
+
+	else :
+		holidaysDict = {}
+		dateAndTime = datetime.now()
+		day = dateAndTime.day
+		secondSaturday = isSecondSaturday()
+		if secondSaturday >= day:
+			holidaysDict[str(secondSaturday)] = 'Second Saturday'
+		if findDay() == 6:
+			holidaysDict[str(day)] = 'Sunday'
+		if not (key == None and value == None):
+			holidaysDict[str(key)] = value
+		for holidayDate in list(holidaysDict):
+			if int(holidayDate) < day:
+				holidaysDict.pop(holidayDate)
+
 	jsonData["holidaysList"].update(holidaysDict)
 	sendDataToJSON('log.json', jsonData)
 
@@ -148,23 +155,25 @@ def loadTimeTable():
 	sendDataToJSON('log.json', jsonData)
 
 
+
 def classesToday():
 	loadTimeTable()
 	date = findDay()
 	classes = []
-	holidaysList()
+	updateholidaysList()
 	jsonData = fetchDataFromJSON('log.json')
 	holidays = jsonData["holidaysList"]
 	dateAndTime = datetime.now()
 	day = dateAndTime.day
 	weekDay = dateAndTime.today().strftime('%A')
-	weekDay = "Thursday"
-	day = 15
-	classes = []
-	classtime = []
+
 	if str(day) in holidays:
-		print("Today is a holiday due to ", holidays[str(day)])
+		console.print("\n\tToday is a holiday due to ", style = "bold cyan", end = '')
+		console.print(holidays[str(day)] + '\n', style = "bold yellow")
 	else:
+		print(text2art("Today's Schedule", font = "small"))
+		classes = []
+		classtime = []
 		classesToday = jsonData["completeTimeTable"][weekDay]
 		timings = jsonData["completeTimeTable"]["Timings"]
 		timings = timings[:len(classesToday)]
@@ -179,36 +188,75 @@ def classesToday():
 				classtime.append(timings[i])
 				prevClass = classesToday[i]
 
-	t = {classtime[i]: classes[i] for i in range(len(classtime))}
+		t = {classtime[i]: classes[i] for i in range(len(classtime))}
 
+		jsonData = fetchDataFromJSON('log.json')
+		jsonData["todaysTimeTable"] = t
+		sendDataToJSON('log.json', jsonData)
+
+		currentTime = dateAndTime.time()
+		print('\t' + toBold('Current time: ') + toBold(str(currentTime))[:12])
+		time = str(currentTime).split(":")
+
+		table = Table(title="Today's Time Table", show_lines=True)
+
+		table.add_column("Timings", justify = "center", style = "cyan", no_wrap = True)
+		table.add_column("Class", justify = "center", style = "green")
+		table.add_column("Status", justify = "center", style = "magenta")
+		
+
+		classFlag = False
+		for i in range(len(classtime)):
+			if (time[0] >= classtime[i][0:2] and time[1] >= classtime[i][3:5]) and (time[0] < classtime[i][8:10] and time[1] <= '59'): 
+				table.add_row(classtime[i], classes[i], "[bold magenta] ONGOING [green]:hourglass:")
+				classFlag = True
+			else:
+				if classFlag == True:
+					table.add_row(classtime[i], classes[i])
+				else :
+					table.add_row(classtime[i], classes[i], "[bold magenta]COMPLETED [green]:heavy_check_mark:")
+
+		console.print(table)
+
+def displayTimeTable():
+	print(text2art("Time Table", font = "small"))
+	loadTimeTable()
 	jsonData = fetchDataFromJSON('log.json')
-	jsonData["todaysTimeTable"] = t
-	sendDataToJSON('log.json', jsonData)
+	t = jsonData["completeTimeTable"]
+	dateAndTime = datetime.now()
+	weekDay = dateAndTime.today().strftime('%A')
+	weekDay = "Thursday"
+	table = Table(show_lines=True)
 
-	currentTime = dateAndTime.time()
-	print('\t' + toBold('Current time: ') + toBold(str(currentTime))[:12])
-	time = str(currentTime).split(":")
+	timetableKeys = list(t.keys())
 
-	table = Table(title="Today's Time Table", show_lines=True)
+	table.add_column(timetableKeys[0], justify = "center", style = "cyan", no_wrap = True)
 
-	table.add_column("Timings", justify = "center", style = "cyan", no_wrap = True)
-	table.add_column("Class", justify = "center", style = "green")
-	table.add_column("Status", justify = "center", style = "magenta")
-	
+	for i in range(len(t[timetableKeys[0]])):
+		table.add_column(t[timetableKeys[0]][i], justify = "center", style = "yellow", no_wrap = True)
 
-	classFlag = False
-	for i in range(len(classtime)):
-		if (time[0] >= classtime[i][0:2] and time[1] >= classtime[i][3:5]) and (time[0] < classtime[i][8:10] and time[1] <= '59'): 
-			table.add_row(classtime[i], classes[i], "[bold magenta] ONGOING [green]:hourglass:")
-			classFlag = True
+	for i in timetableKeys[1:]:
+		tempList = [i] + t[i]
+		if weekDay == i:
+			table.add_row(*tempList, style = "bold")
 		else:
-			if classFlag == True:
-				table.add_row(classtime[i], classes[i])
-			else :
-				table.add_row(classtime[i], classes[i], "[bold magenta]COMPLETED [green]:heavy_check_mark:")
-
+			table.add_row(*tempList)
+	
 	console.print(table)
 
+def displayHolidaysList():
+	updateholidaysList()
+	data = fetchDataFromJSON('log.json')
+	holidayListKeys = list(data["holidaysList"].keys())
+	table = Table(title = "[blink2 bold dodger_blue1]Holidays List", show_lines=True)
+	table.add_column("[dark_orange]Date", justify = "center", style = "yellow3", no_wrap = True)
+	table.add_column("[dark_orange]Occasion", justify = "center", style = "yellow3", no_wrap = True)
+	for key in holidayListKeys:
+		value = data["holidaysList"][key]
+		l = [key, value]
+		table.add_row(*l)
+
+	console.print(table)
 
 def whichClass() :
 	loadTimeTable()
@@ -362,7 +410,7 @@ def joinClass(subject, driver):
 	minCountToLeave = data['otherData']['minCountToLeave']
 	alertWords = data['otherData']['alertWords']
 
-	# Reads the text from captions str(count) > '30':
+	# Reads the text from captions until str(count) > '30':
 	while True:
 		count = driver.find_element_by_xpath(membersCountXPath).text
 		printInSameLine('Members Count: ', count, sleepTime = 0, isChar = False)
@@ -390,9 +438,8 @@ def joinClass(subject, driver):
 			if count > str(minCountToLeave):
 				flag = True
 			if count < str(minCountToLeave) and flag :
-				console.print('\nExiting Class', style = "bold red")
+				console.print('\nExiting Class', style = "blink2 bold red")
 				driver.close()
-				#printInSameLine(sleepTime = 10)
 				richStatus(sleepTime = 5, statusMessage = 'Left the class')
 				break
 
@@ -412,7 +459,6 @@ def sendMessageInChatBox(driver, message):
 	print('Responded to the class by sending ', toBold(responseMessage))
 	richStatus(text = 'Message sent successfully', sleepTime = 10, spinnerType = 'point') 
 
-	
 
 def alertSound():
 	beep = lambda x: os.system("echo -n '\a'; sleep 0.2;" * x)
@@ -421,9 +467,11 @@ def alertSound():
 	print('Played alert sound successfully')
 	richStatus(text = 'Played alert sound successfully', sleepTime = 10, spinnerType = 'point') 
 
+
 def loadDriver():
 	pathToChromeDriver = data['dir']['pathToChromeDriver']
 	driver = webdriver.Chrome(options = chromeOptions, executable_path = pathToChromeDriver)
+	driver.maximize_window()
 
 	print('Disabled extensions')
 	print('Turned off Location')
@@ -431,10 +479,7 @@ def loadDriver():
 	console.print('Turned off Microphone', style = "bold red")
 	print('Turned off Pop-up')
 
-	driver.maximize_window()
-
 	driver.get('https://classroom.google.com')
-	#printInSameLine(sleepTime = 5)
 	print('Opening Google Classroom')
 	richStatus(sleepTime = 5)
 
@@ -444,6 +489,7 @@ def loadDriver():
 def login():
 	pathToChromeDriver = data['dir']['pathToChromeDriver']
 	driver = webdriver.Chrome(options = chromeOptions, executable_path = pathToChromeDriver)
+	driver.maximize_window()
 
 	print('Disabled extensions')
 	print('Turned off Location')
@@ -451,10 +497,9 @@ def login():
 	console.print('Turned off Microphone', style = "bold red")
 	print('Turned off Pop-up')
 
-	driver.maximize_window()
-
-	print('Logging into ' + toBold('Google account'))
 	
+
+	print('Logging into ' + toBold('Google account')
 	driver.get('https://classroom.google.com/?emr=0')
 	time.sleep(3)
 
@@ -481,3 +526,18 @@ def login():
 	print('Login Successful')
 
 	return driver
+
+
+def helpFunction():
+	table = Table(show_lines=True)
+	table.add_column("Arguments", justify = "center", style = "yellow3", no_wrap = True)
+	table.add_column("Details", justify = "center", style = "yellow3")
+	table.add_row("no arguments", "runs the main program")
+	table.add_row("--t", "displays todays timetable")
+	table.add_row("--h", "displays holidays list")
+	table.add_row("--h -a", "add new holiday to the list and prints")
+	table.add_row("--h -r", "removes holiday from the list and prints")
+	table.add_row("--t -f", "displays complete timetable fetched from excel sheet")
+	console.print(table)
+
+		

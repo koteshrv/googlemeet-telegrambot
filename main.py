@@ -30,7 +30,6 @@ if argLen == 1:
 	if not noClasses:
 
 		classNow = whichClass()
-
 		
 		else :
 			driver = loadDriver()
@@ -64,31 +63,37 @@ elif argLen == 2:
 	arg = sys.argv[1].lower()
 
 	if arg == '--t':
-		print(text2art("Time Table", font = "small"))
 		classesToday()
-		#print(whichClass())
 
 	elif arg == '--h':
-		holidaysList()
-		data = fetchDataFromJSON('log.json')
-		print(data["holidaysList"])
+		displayHolidaysList()
+
+	elif arg == '--help':
+		helpFunction()
 
 	else :
-		print('Wrong argument ', arg)
+		print('Wrong argument ', 'check "--help" for help')
 
-elif arglen == 3:
+elif argLen == 3:
 	arg1 = sys.argv[1].lower()
 	arg2 = sys.argv[2].lower()
 
-	if arg1 == '--h' and arg2 == '-u':
+	if arg1 == '--h' and arg2 == '-a':
 		date, occasion = input("Enter holiday and occasion: ").split()
-		holidaysList(date, occasion)
+		updateholidaysList(date, occasion)
 		data = fetchDataFromJSON('log.json')
-		print(data["holidaysList"])
+		displayHolidaysList()
+
+	elif arg1 == '--h' and arg2 == '-r':
+		date = input("Enter the date you wanted to remove: ")
+		updateholidaysList(date, remove = True)
+		data = fetchDataFromJSON('log.json')
+		displayHolidaysList()
+
+	elif arg1 == '--t' and arg2 == '-f':
+		displayTimeTable()
 
 	else :
-		print('Wrong argument ', option)
-
-			
+		print('Wrong argument ', 'add "--help" for help')			
 
 	

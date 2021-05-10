@@ -47,8 +47,15 @@ if argLen == 1:
 			classNow = whichClass()
 			if(classNow == None) :
 				print('No ongoing classes at the moment')
+
+			if classNow == "Lunch":
+				TimeLeftForNextClass = 60 - int(str(datetime.now().time())[3:5]) # minutes
+				printInSameLine(str1 = 'Lunch Time. Will trying again in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = TimeLeftForNextClass, color = "bold red", minutes = True)
+		
+
 			
 			classAlreadyAttended = False
+			classAlreadyAttendedFlag = True
 
 			while True:
 				log = fetchDataFromJSON('log.json')
@@ -60,7 +67,14 @@ if argLen == 1:
 					usedPrintInSameLine = True
 					#time.sleep(30)
 				elif classAlreadyAttended:
-					printInSameLine(str1 = classNow + ' class already attended. Trying again in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = 30)
+					if classAlreadyAttendedFlag:
+						if usedPrintInSameLine:
+							printInSameLine(newLine = True)
+						print(classNow + ' class already joined!')
+						print("Joining time: ", joiningLeavingTime[classNow]["joining time"][:8])
+						print("Leaving time: ", joiningLeavingTime[classNow]["leaving time"][:8])
+						classAlreadyAttendedFlag = False
+					printInSameLine(str1 = "Trying again in ", str2 = ' seconds', isChar = False, seconds = True, sleepTime = 30)
 					usedPrintInSameLine = True
 				else :
 					break

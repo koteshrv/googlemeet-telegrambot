@@ -9,11 +9,13 @@
         "OOPSLAB": "https://classroom.google.com/c/MzEyMjg2NzQ5Nzc1",
         "PDSS": "https://classroom.google.com/c/MzEzMDA0MzMzODQz",
         "R&A": "https://classroom.google.com/c/MTI2NTM4NzY2NjMx",
-        "TEST": "https://classroom.google.com/c/MzM1OTAwMDE3Mzc2"
+        "TEST": "https://classroom.google.com/c/MzM1OTAwMDE3Mzc2",
+        "TEST2" : "https://classroom.google.com/c/MzM5MTA2NDUzNTQz"
     },
     "credentials": {
         "mailAddress": "",
-        "password": ""
+        "password": "",
+        "discordURL": "https://discordapp.com/api/webhooks/841095641261801503/2nLE0BrgE6sY1kyYuFLHfMzCDFskcE-ff3KULBNBuO8IkatEeEjRFiOZueKyu5zL5zJ5"
     },
     "dir": {
         "pathToChromeDriver": "/home/koteshrv/.local/bin/chromedriver",
@@ -25,15 +27,16 @@
             "koteswararao",
             "hod",
             "454",
-            "attendance",
-            "respond"
+            "attendance"
         ],
         "minCountToJoin": 0,
         "minCountToLeave": 2,
-        "soundFrequency": 30,
+        "soundFrequency": 40,
         "responseMessage": "present sir",
         "linkPostedSeperatelyInAnnouncementTab": [
-            "R&A"
+            "R&A",
+            "CN",
+            "TEST"
         ]
     }
 }

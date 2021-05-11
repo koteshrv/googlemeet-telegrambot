@@ -10,6 +10,7 @@ from rich.table import Table
 from art import *
 import openpyxl, calendar, requests, json, time, sys, os, re
 
+
 class color:
    PURPLE = '\033[95m'
    CYAN = '\033[96m'
@@ -22,20 +23,29 @@ class color:
    UNDERLINE = '\033[4m'
    END = '\033[0m'
 
+
+# fetch data from json and returns data
+# argument: file name of json
 def fetchDataFromJSON(fileName):
 	with open(fileName) as file:
 		data = json.load(file)
 	return data
 
+# export data to json
+# arguments: name of the file and data that we want to export
 def sendDataToJSON(fileName, data):
 	with open(fileName, 'w') as file:
-		json.dump(data, file, indent = 4)
+		json.dump(data, file, indent = 4)		
+
 
 data = fetchDataFromJSON('data.json')
-
 profilePath = data['dir']['profilePath']
 
+# rich console
+# https://github.com/willmcgugan/rich
 console = Console()
+
+# chrome options
 chromeOptions = Options()
 chromeOptions.add_argument("--disable-extensions")
 chromeOptions.add_argument("--disable-popup-blocking")
@@ -48,6 +58,7 @@ chromeOptions.add_experimental_option("prefs", { \
 "profile.default_content_setting_values.notifications": 2
 })
 
+# classes and xpaths of google meet and google classroom elements
 mailBoxXPath = '//*[@id="identifierId"]'
 nextButtonXPath = '//*[@id="identifierNext"]/div/button'
 enterPasswordBoxXPath = '//*[@id="password"]/div[1]/div/div[1]/input'
@@ -55,11 +66,11 @@ passwordNextButtonXPath = '//*[@id="passwordNext"]/div/button/div[2]'
 meetLinkXPath = '//*[@id="yDmH0d"]/div[4]/div[3]/div/div[1]/div/div[2]/div[2]/div/span/a'
 meetLinkInCommentsXPath = '//*[@id="ow43"]/div[2]/div/div[1]/div[2]/div[1]/html-blob/span/a[1]'
 dateTimeInCommentsXPath = '//*[@id="ow43"]/div[2]/div[1]/div[1]/div[1]/div[1]/span/span[1]'
-
 classroomPostClass = 'n8F6Jd'
 meetLinkClass = 'qyN25' 
 warningDismissButton = '//*[@id="yDmH0d"]/div[3]/div/div[2]/div[3]/div/span/span'
 membersCountBeforeJoiningClass = 'Yi3Cfd'
+messageAboveJoinButtonClass = 'JMAjle'
 joinButtonXPath = '//*[@id="yDmH0d"]/c-wiz/div/div/div[9]/div[3]/div/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[1]/div[1]/span/span'
 captionsButtonXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[9]/div[3]/div[2]/div/span/span/div/div[1]/i'
 captionsXPath = 'VbkSUe'
@@ -67,13 +78,16 @@ membersCountXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[1]/div[3]/div/d
 chatBoxButtonXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[1]/div[3]/div/div[2]/div[3]/span/span'
 chatBoxXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div/div[2]/div[2]/div[2]/span[2]/div/div[4]/div[1]/div[1]/div[2]/textarea'
 chatSendButtonXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div/div[2]/div[2]/div[2]/span[2]/div/div[4]/div[2]/span/span'
-chatBoxCloseXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div/div[2]/div[1]/div[2]/div/span/button/i'			
+chatBoxCloseXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div/div[2]/div[1]/div[2]/div/span/button/i'	
 
-def richStatus(text = 'Loading...', sleepTime = 10, spinnerType = 'dots', statusMessage = 'Done'):
+
+# custom output
+def richStatus(text = 'Loading...', sleepTime = 10, spinnerType = 'dots', statusMessage = 'Done', color = "green"):
 	with console.status("[bold white] " + text, spinner = spinnerType) as status:
 		time.sleep(sleepTime)
-	console.print('[bold][green]' + statusMessage)
+	console.print(statusMessage, style = "bold " + color)
 
+# custom output
 def printInSameLine(str1 = 'Loading', str2 = '.', sleepTime = 10, isChar = True, newLine = False, seconds = False, color = "bold green", minutes = False):
 	if newLine:
 		print()
@@ -100,46 +114,48 @@ def printInSameLine(str1 = 'Loading', str2 = '.', sleepTime = 10, isChar = True,
 	if isChar:
 		print('')
 
+# compares time and returns true of false
+# if twoValues is False, then it returns true when given time is greater than current time else returns False
+# if twoValues is True, then it returns true when current time lies between both times else returns False
 def compareTime(hours1 = 0, minutes1 = 0, hours2 = 0, minutes2 = 0, twoValues = False):
 	temp1 = datetime.now()
 	timeNow = datetime.now()
-
 	if twoValues:
 		temp2 = datetime.now()
 		return (timeNow < temp2.replace(hour = hours2, minute = minutes2) and timeNow > temp1.replace(hour = hours1, minute = minutes1)) 
-
 	return timeNow < temp1.replace(hour = hours1, minute = minutes1)
 
-
+# returns current day with 0 index
+# if current day is Monday then it returns 0, Tueday 1, Wednesday 2 ... and for Sunday 6
 def findDay():
 	dateAndTime = datetime.now()
 	date = str(dateAndTime.day) + ' ' + str(dateAndTime.month) + ' ' + str(dateAndTime.year)
-	date = datetime.strptime(date, '%d %m %Y').weekday()
-	return date
+	weekDay = datetime.strptime(date, '%d %m %Y').weekday()
+	return weekDay
 
-
+# returns second saturday of present month
 def isSecondSaturday():
 	dateAndTime = datetime.now()
 	month = dateAndTime.month
 	year = dateAndTime.year
 	day = dateAndTime.day
-
 	monthCalendar = calendar.monthcalendar(year, month)
 	if monthCalendar[0][calendar.SATURDAY]:
 		secondSaturday = monthCalendar[1][calendar.SATURDAY]
 	else:
 		secondSaturday = monthCalendar[2][calendar.SATURDAY]
-	
 	return secondSaturday
 
-
+# updates the holiday list
+# when no key and value are given, then it checks for second saturday and sunday
+# when key and value are given then it updates the holiday list with key and value and also check for second saturday and sunday
+# when remove is true, then it removes the key and value from the holidays list
 def updateholidaysList(key = None, value = None, remove = False):
 	jsonData = fetchDataFromJSON('log.json')
 	holidaysDict = jsonData["holidaysList"]
 	if remove:
 		del holidaysDict[key]
 		console.print('Deleted '+ key + ' from holidays list successfully', style = "gold3")
-
 	else :
 		dateAndTime = datetime.now()
 		day = dateAndTime.day
@@ -157,6 +173,7 @@ def updateholidaysList(key = None, value = None, remove = False):
 	jsonData["holidaysList"].update(holidaysDict)
 	sendDataToJSON('log.json', jsonData)
 
+# loads the time table from the excel sheet and then updates the classes today
 def loadTimeTable():
 	classTimeTableLocation = data['dir']['classTimeTableLocation']
 	timetablewb = openpyxl.load_workbook(classTimeTableLocation) 
@@ -172,14 +189,15 @@ def loadTimeTable():
 			if cellValue.value != None:
 				rowValues.append(cellValue.value)
 		completeTimeTable[keyValue.value] = rowValues
-
-
 	jsonData = fetchDataFromJSON('log.json')
 	jsonData["completeTimeTable"].update(completeTimeTable)
 	sendDataToJSON('log.json', jsonData)
-
 	classesToday()
 
+# returns the status of the classwork
+# if no class is going on, then it returns False which means that classes are scheduled later
+# if classwork is completed then it returns True which means all classes are already completed
+# if classwork is going on, then it returns -1
 def classStatus():
 	jsonData = fetchDataFromJSON('log.json')
 	todaysTimeTable = jsonData["todaysTimeTable"]
@@ -192,21 +210,20 @@ def classStatus():
 		return -1
 	if compareTime(int(startTime[:2]), int(startTime[3:])):
 		return False
-	if notcompareTime(int(endTime[:2]), int(endTime[3:])):
+	if not compareTime(int(endTime[:2]), int(endTime[3:])):
 		return True
 
 	
-	
+# subtracts the time (24 hour format)
 def subtractTime(time1, time2):
 	hour1, minutes1 = time1[:2], time1[3:]
 	hour2, minutes2 = time2[:2], time2[3:]
-
 	if minutes1 >= minutes2:
 		return str(int(hour1) - int(hour2)) + ':' + str(int(minutes1) - int(minutes2))
 	else :
 		return str(int(hour1) - int(hour2) - 1) + ':' + str(60 - int(minutes2) + int(minutes1))
 
-
+# makes a schedule  for classes today and prints  
 def classesToday(printTable = False):
 	date = findDay()
 	classes = []
@@ -216,7 +233,6 @@ def classesToday(printTable = False):
 	dateAndTime = datetime.now()
 	day = dateAndTime.day
 	weekDay = dateAndTime.today().strftime('%A')
-
 	if str(day) in holidays:
 		console.print("\n\tToday is a holiday due to ", style = "bold cyan", end = '')
 		console.print(holidays[str(day)] + '\n', style = "bold yellow")
@@ -226,9 +242,7 @@ def classesToday(printTable = False):
 		classesToday = jsonData["completeTimeTable"][weekDay]
 		timings = jsonData["completeTimeTable"]["Timings"]
 		timings = timings[:len(classesToday)]
-
 		prevClass = ''
-
 		for i in range(len(classesToday)):
 			if classesToday[i] == prevClass:
 				classtime[-1] = classtime[-1][:8] + timings[i][8:]
@@ -236,30 +250,24 @@ def classesToday(printTable = False):
 				classes.append(classesToday[i])
 				classtime.append(timings[i])
 				prevClass = classesToday[i]
-
 		t = {classtime[i]: classes[i] for i in range(len(classtime))}
-
 		jsonData = fetchDataFromJSON('log.json')
+		classLoginLog = jsonData["log"]["classStatus"]
+		classesAlreadyAttended = list(classLoginLog.keys())
 		jsonData["todaysTimeTable"] = t
 		sendDataToJSON('log.json', jsonData)
-
 		if printTable:
-			
 			currentTime = dateAndTime.time()
 			time = str(currentTime).split(":")
-
 			table = Table(show_lines=True)
-
 			table.add_column("Timings", justify = "center", style = "cyan", no_wrap = True)
 			table.add_column("Class", justify = "center", style = "green")
 			table.add_column("Status", justify = "center", style = "magenta")
-
 			classFlag = False
 			for i in range(len(classtime)):
-
 				if (not classFlag) and compareTime(int(classtime[i][0:2]), int(classtime[i][3:5])):
 					table.add_row(classtime[i], classes[i], "[bold magenta] Scheduled [green]:hourglass:")
-				elif compareTime(int(classtime[i][0:2]), int(classtime[i][3:5]), int(classtime[i][8:10]), int(classtime[i][11:]), True):
+				elif compareTime(int(classtime[i][0:2]), int(classtime[i][3:5]), int(classtime[i][8:10]), int(classtime[i][11:]), True) and (not(classtime[i] in classesAlreadyAttended)):
 					table.add_row(classtime[i], classes[i], "[bold magenta] ONGOING [green]:hourglass:")
 					classFlag = True
 				else:
@@ -267,24 +275,39 @@ def classesToday(printTable = False):
 						table.add_row(classtime[i], classes[i])
 					else :
 						table.add_row(classtime[i], classes[i], "[bold magenta]COMPLETED [green]:heavy_check_mark:")
-
 			console.print(table)
+			print()
 
-
-def whichClass() :
+# returns current class 
+# if no class is going on or if the current class is already attended then it will return None
+def whichClass(nextClass = False, nextClassTime = False, currentClassTime = False) :
 	loadTimeTable()
 	jsonData = fetchDataFromJSON('log.json')
 	subjects = jsonData["todaysTimeTable"]
+	classLoginLog = jsonData["log"]["classStatus"]
+	classesAlreadyAttended = list(classLoginLog.keys())
+	classCount = len(subjects)
+	nextClassFlag = False
 	for i in subjects:
+		if nextClassFlag and (not nextClassTime):
+			return subjects[i]
+		if nextClassFlag and nextClassTime:
+			return (i, subjects[i])
 		time = datetime.now().time()
 		time = str(time).split(":")
-		#if (time[0] >= i[0:2] and time[1] >= i[3:5]) and (time[0] <= i[8:10] and time[1] <= i[11:]):
-		if compareTime(int(i[0:2]), int(i[3:5]), int(i[8:10]), int(i[11:]), True):
-			return subjects[i]		
-
+		if nextClass:
+			if compareTime(int(i[0:2]), int(i[3:5]), int(i[8:10]), int(i[11:]), True):
+				nextClassFlag = True
+				continue
+		elif compareTime(int(i[0:2]), int(i[3:5]), int(i[8:10]), int(i[11:]), True) and (not(i in classesAlreadyAttended)):	
+			if currentClassTime:
+				return (i, subjects[i])
+			return subjects[i]	
+	if nextClassTime or currentClassTime:
+		return (None, None)
 	return None
 
-
+# prints complete time table
 def displayTimeTable():
 	loadTimeTable()
 	jsonData = fetchDataFromJSON('log.json')
@@ -292,23 +315,19 @@ def displayTimeTable():
 	dateAndTime = datetime.now()
 	weekDay = dateAndTime.today().strftime('%A')
 	table = Table(show_lines=True)
-
 	timetableKeys = list(t.keys())
-
 	table.add_column(timetableKeys[0], justify = "center", style = "cyan", no_wrap = True)
-
 	for i in range(len(t[timetableKeys[0]])):
 		table.add_column(t[timetableKeys[0]][i], justify = "center", style = "yellow", no_wrap = True)
-
 	for i in timetableKeys[1:]:
 		tempList = [i] + t[i]
 		if weekDay == i:
 			table.add_row(*tempList, style = "bold")
 		else:
 			table.add_row(*tempList)
-	
 	console.print(table)
 
+# displays holidays list
 def displayHolidaysList():
 	updateholidaysList()
 	data = fetchDataFromJSON('log.json')
@@ -322,50 +341,36 @@ def displayHolidaysList():
 		l = [key, value]
 		table.add_row(*l)
 		holidaysFlag = True
-
 	if holidaysFlag:
 		console.print(table)
 	else :
 		console.print("You dont have any holidays", style = "bold gold1")
 
+# updates the time table by taking day period and class to update
+# day should be string of any format. eg: "Monday", "monday", "MONday"
+# period should be passed as stored in excel sheet
+# class that you want to replace with
+# if you want to remove a class then just pass the class with ''
 def updateTimeTable(day, period, classToUpdate):
 	classTimeTableLocation = data['dir']['classTimeTableLocation']
 	timetablewb = openpyxl.load_workbook(classTimeTableLocation) 
 	sheet = timetablewb.active
 	day = day.lower()
-	rowValues = {
-					"monday" 	: 2,
-					"tuesday"	: 3,
-					"wednesday" : 4,
-					"thursday" 	: 5,
-					"friday" 	: 6,
-					"saturday" 	: 7,
-				}
-
-	colDict = {
-					'1' : "09:00 - 10:00", 
-					'2' : "10:00 - 11:00", 
-					'3' : "11:00 - 12:00", 
-					'4' : "12:00 - 13:00", 
-					'5' : "13:00 - 14:00", 
-					'6' : "14:00 - 15:00", 
-					'7' : "15:00 - 17:00"
-	}
-
-	colValues = { 
-					"09:00 - 10:00" : 'B', 
-					"10:00 - 11:00" : 'C', 
-					"11:00 - 12:00" : 'D', 
-					"12:00 - 13:00" : 'E', 
-					"13:00 - 14:00" : 'F', 
-					"14:00 - 15:00" : 'G', 
-					"15:00 - 17:00" : 'H'
-				}	
-	
+	log = fetchDataFromJSON('log.json')
+	i, val, asciiVal = 1, 2, 66
+	rowValues, colValues, colDict = {}, {}, {}
+	for key in list(log['completeTimeTable'].keys())[1:] :
+		key = key.lower()
+		rowValues[key] = str(val)
+		colValues[key] = chr(asciiVal)
+		colDict[str(i)] = key
+		i += 1
+		asciiVal += 1	
+		val += 1	
 	sheet[colValues[colDict[period]] + str(rowValues[day])] = classToUpdate
 	timetablewb.save(classTimeTableLocation)
 
-
+# prints the arguments and their uses 
 def helpFunction():
 	table = Table(show_lines=True)
 	table.add_column("Arguments", justify = "center", style = "yellow3", no_wrap = True)
@@ -380,7 +385,7 @@ def helpFunction():
 	table.add_row("--t -u", "changes timetable and displays complete timetable fetched from excel sheet")
 	console.print(table)
 
-
+# returns the count of members joined before joining the class
 def membersAlreadyJoinedCount(text):
 	if text == 'No one else is here':
 		return 0
@@ -391,13 +396,14 @@ def membersAlreadyJoinedCount(text):
 	if len(numberFromText) > 0:
 		count = numberFromText[0]
 		andCount = 0
-
 	count = count + commasCount + andCount + 1
 	return count
 
-
+# joins the class of given subject
 def joinClass(subject, driver):
-	
+	# used when we want to implicitly wait 
+	# time = 1800/60 = 30 minutes
+	wait = WebDriverWait(driver, 1800) 
 	log = {}
 	subject = subject.upper()
 	url = data['classroomLinks'][subject]
@@ -408,80 +414,84 @@ def joinClass(subject, driver):
 	driver.get(url)
 	richStatus(sleepTime = 5)
 	print('Waiting for Google Meet link for ' + subject + ' class')
-
 	usedPrintInSameLine = False
 	linkPostedSeperatelyInAnnouncementTab = data['otherData']['linkPostedSeperatelyInAnnouncementTab']
-
-
+	# if subject link is posted seperately in announcement tab
 	if subject in linkPostedSeperatelyInAnnouncementTab:	
+		print(subject + ' class Link is posted in announcement tab')
+		print('So trying to fetch data from announcement tab')
 		previousPostData = None
 		while True:
-			#From the below fetched data check the date is matching before joining
+			# from the below fetched data
+			# check the date is matching before joining
+			# if the link is posted today, then the element stores the time for eg: "12.06 AM"
+			# if the link is not posted today, then element stores the day for eg: "May 11"
 			announcementTabData = str(driver.find_element_by_class_name(classroomPostClass).text)
 			announcementTabpostedDateTime = str(driver.find_element_by_xpath(dateTimeInCommentsXPath).text)
-
 			if previousPostData != announcementTabData :
-				print('Fetched Data \n')
-				print(color.BOLD + announcementTabData + color.END + '\n')
-
+				print('\n' + color.BOLD +'Fetched Data' + color.END + '\n')
+				print(color.BOLD + color.YELLOW + announcementTabData + color.END + '\n')
 			previousPostData = announcementTabData
-
-			#classURL = driver.find_element_by_xpath(meetLinkInCommentsXPath).text
+			# fetching url from annoucement tab data
+			# until url is fetched, the page loads for every 10 seconds
 			classURL = re.search("(?P<url>https?://[^\s]+)", announcementTabData).group("url")
-
-		
 			if not announcementTabpostedDateTime[8].isalpha():
-				'''if usedPrintInSameLine == True:
-					printInSameLine(newLine = True)'''
 				if (classURL[:24] == 'https://meet.google.com/') :
-					print('Fetched ', classURL, ' from the google classroom')
+					print('Fetched class link from the google classroom')
 					print('Opening ', classURL)
 					driver.get(classURL)
-					#printInSameLine(sleepTime = 5)
 					richStatus(sleepTime = 5)
 					break
-
 				else:
-					print('Fetching Link failed')
-				
+					print('Fetching link failed or link not posted')
 			else :
 				driver.refresh()
 				printInSameLine(str1 = 'Waiting for Todays link. Trying again in ', str2 = ' seconds', isChar = False, seconds = True)
 				usedPrintInSameLine = True
-
+	# fetches data from link posted in google classroom
+	# if link is not available and it loads and check for every 10 seconds
 	else :
-		
 		while True:
-			
-			if usedPrintInSameLine == True:
-				printInSameLine(newLine = True)
-			classData = driver.find_element_by_class_name(meetLinkClass).text
-			classURL = re.search("(?P<url>https?://[^\s]+)", classData).group("url")
-			if classURL[:24] == 'https://meet.google.com/':
-				print('Fetched ', classURL +' from the google classroom')
-				print('Opening ', classURL)
-				driver.get(classURL)
-				print('Opened meet link')
-				richStatus(sleepTime = 5)
-				break		
-
+			try:
+				classData = driver.find_element_by_class_name(meetLinkClass).text
+				classURL = re.search("(?P<url>https?://[^\s]+)", classData).group("url")
+				if classURL[:24] == 'https://meet.google.com/':
+					if usedPrintInSameLine == True:
+						printInSameLine(newLine = True)
+					print('Fetched class link from the google classroom')
+					print('Opening ', classURL)
+					driver.get(classURL)
+					print('Opened meet link')
+					richStatus(sleepTime = 5)
+					break
+			except AttributeError:
+				print('Meet link not available to fetch.')
+				driver.refresh()
+				printInSameLine(str1 = 'Trying again in ', str2 = ' seconds', isChar = False, seconds = True)
+				usedPrintInSameLine = True
 	print('Pressing dismiss button')
 	warningDismiss = driver.find_element_by_xpath(warningDismissButton).click()
 	time.sleep(3)
-
-	membersCountBeforeJoiningData = driver.find_element_by_class_name(membersCountBeforeJoiningClass).text
-	print('Members Joined\n')
-	print(str(membersCountBeforeJoiningData), '\n')
-
-	joinedMembers = membersAlreadyJoinedCount(membersCountBeforeJoiningData)
-
+	# fetching count of members already joined
+	# if members count is not available then is sets the  minCountToJoinConsidered to False
+	try :
+		membersCountBeforeJoiningData = driver.find_element_by_class_name(membersCountBeforeJoiningClass).text
+		print('\n' + color.BOLD + color.YELLOW + str(membersCountBeforeJoiningData) + color.END + '\n')
+		joinedMembers = membersAlreadyJoinedCount(membersCountBeforeJoiningData)
+		minCountToJoinConsidered = True
+		minCountToJoin = data['otherData']['minCountToJoin']
+	except NoSuchElementException:
+		#messageAboveJoinButtonData = driver.find_element_by_class_name(messageAboveJoinButtonClass).text
+		print("Members count not available! So joining the class without considering 'minCountToJoin'")
+		minCountToJoinConsidered = False
 	usedPrintInSameLine = False
-	minCountToJoin = data['otherData']['minCountToJoin']
-
+	# checking for minCountToJoin to join the class
 	while True:
-		if usedPrintInSameLine == True:
-			printInSameLine(newLine = True)
+		if not minCountToJoinConsidered:
+			break
 		if joinedMembers >= minCountToJoin: 
+			if usedPrintInSameLine == True:
+				printInSameLine(newLine = True)
 			print('More than ' + str(minCountToJoin) + ' members already joined')
 			print('Joining the class now')
 			break
@@ -490,57 +500,54 @@ def joinClass(subject, driver):
 				printInSameLine(str1 = 'No one joined. Trying again in ', str2 = ' seconds', isChar = False, seconds = True)
 				usedPrintInSameLine = True
 			else :
+				if usedPrintInSameLine == True:
+					printInSameLine(newLine = True)
 				print('Only ' + str(joinedMembers) + ' joined')
 				print('Waiting for ' + str(minCountToJoin - joinedMembers) + ' more students to join the class')
 				printInSameLine(str1 = 'Trying again in ', str2 = ' seconds', isChar = False, seconds = True)
 				usedPrintInSameLine = True
 				membersCountBeforeJoiningData = driver.find_element_by_class_name(membersCountBeforeJoiningClass).text
 				joinedMembers = membersAlreadyJoinedCount(membersCountBeforeJoiningData)
-
-
-	# clicks join button
+	# waits until join button is clickable
+	element = wait.until(EC.element_to_be_clickable((By.XPATH, joinButtonXPath)))
+	element.click()
 	print('Pressing join button')
-	join = driver.find_element_by_xpath(joinButtonXPath).click()
-
+	# waits until caption button is clickable and turn on captions
+	element = wait.until(EC.element_to_be_clickable((By.XPATH, captionsButtonXPath)))
+	element.click()
+	print('Turning on captions')
+	# sending class joining time to discord
 	discord("Joined " + subject + " class at " + str(datetime.now().time())[:8])
-
+	classTime = whichClass(currentClassTime = True)[0]
 	joiningLeavingTimeDict = {}
 	joiningLeavingTimeDict["joining time"] = str(datetime.now().time())
-	if subject in log:
-		log[subject].update(joiningLeavingTimeDict)
+	if classTime in log:
+		log[classTime].update(joiningLeavingTimeDict)
 	else :
-		log[subject] = joiningLeavingTimeDict
-
+		log[classTime] = joiningLeavingTimeDict
 	logData = fetchDataFromJSON('log.json')
 	logData["log"]["joiningLeavingTime"].update(log)
 	sendDataToJSON('log.json', logData)
 	time.sleep(3)
-
-
-	# turn on captions
-	print('Turning on captions')
-	driver.find_element_by_xpath(captionsButtonXPath).click()
-	time.sleep(4)
-
 	# counting number of students joined 
 	count = driver.find_element_by_xpath(membersCountXPath).text
-
 	flag = False
 	minCountToLeave = data['otherData']['minCountToLeave']
 	alertWords = data['otherData']['alertWords']
-
 	logData = fetchDataFromJSON('log.json')
-
-	# Reads the text from captions until str(count) > '30':
+	# Reads the text from captions until str(count) > minCountToLeave:
 	while True:
 		count = driver.find_element_by_xpath(membersCountXPath).text
 		printInSameLine('Members Count: ', count, sleepTime = 0, isChar = False)
 		try:
+			# flag is used to check when class count reaches above minCountToLeave
+			# when it is set to true it implies that it is waiting to leave the class when count reaches below minCountToLeave
 			if count > str(minCountToLeave):
 				flag = True
 			elems = driver.find_element_by_class_name(captionsXPath)
 			captionTextLower = str(elems.text).lower()
-
+			# if alert word is found in captions then it plays an alert sound for soundFrequency times and then sends alert message to discord
+			# if you want to enable auto replay when this triggers then uncomment the line below. This sends the response message that is given in data.json file
 			for word in alertWords:
 				if word in captionTextLower:
 					discord("ALERT! Some one called you at " + str(datetime.now().time())[:8])
@@ -548,42 +555,40 @@ def joinClass(subject, driver):
 					print(text2art("ALERT", font = "small")) 
 					alertSound() # alert sound for soundCount times
 					#responseMessage = data['otherData']['responseMessage']
-					#sendMessageInChatBox(driver, responseMessage)
-					
+					#sendMessageInChatBox(driver, responseMessage)	
+			# leaves the class when class count is less than minCountToLeave
 			if count < str(minCountToLeave) and flag :
 				discord("Left the " + subject + " class at " + str(datetime.now().time())[:8])
 				joiningLeavingTimeDict["leaving time"] = str(datetime.now().time())
-				log[subject].update(joiningLeavingTimeDict)
+				log[classTime].update(joiningLeavingTimeDict)
 				logData = fetchDataFromJSON('log.json')
-				logData["log"]["joiningLeavingTime"].update({log})
+				logData["log"]["joiningLeavingTime"].update(log)
 				sendDataToJSON('log.json', logData)
-				print('\nExiting Class')
+				console.print('\nExiting Class', style = "blink2 bold red", end = '\r')	
 				driver.close()
 				driver.switch_to.window(driver.window_handles[-1])
+				richStatus(sleepTime = 5, statusMessage = 'Left '+ subject + ' class', color = "bright_yellow")
 				break
-
-
 		except (NoSuchElementException, StaleElementReferenceException):
+			# flag is used to check when class count reaches above minCountToLeave
+			# when it is set to true it implies that it is waiting to leave the class when count reaches below minCountToLeave
 			if count > str(minCountToLeave):
 				flag = True
+			# leaves the class when class count is less than minCountToLeave
 			if count < str(minCountToLeave) and flag :
 				discord("Left the " + subject + " class at " + str(datetime.now().time())[:8])
 				joiningLeavingTimeDict["leaving time"] = str(datetime.now().time())
-				log[subject].update(joiningLeavingTimeDict)
+				log[classTime].update(joiningLeavingTimeDict)
 				logData = fetchDataFromJSON('log.json')
-				logData["log"]["joiningLeavingTime"].update({log})
+				logData["log"]["joiningLeavingTime"].update(log)
 				sendDataToJSON('log.json', logData)
-				console.print('\nExiting Class', style = "blink2 bold red")
+				console.print('\nExiting Class', style = "blink2 bold red", end = '\r')
 				driver.close()
 				driver.switch_to.window(driver.window_handles[-1])
-				richStatus(sleepTime = 5, statusMessage = 'Left the class')
+				richStatus(sleepTime = 5, statusMessage = 'Left '+ subject + ' class', color = "bright_yellow")
 				break
 
-	
-
-	
-
-
+# sends the message in chat box when alert word is triggered in captions
 def sendMessageInChatBox(driver, message):
 	driver.find_element_by_xpath(chatBoxButtonXPath).click()
 	driver.implicitly_wait(10)
@@ -599,7 +604,7 @@ def sendMessageInChatBox(driver, message):
 	print('Responded to the class by sending ', color.BOLD + responseMessage + color.END)
 	richStatus(text = 'Message sent successfully', sleepTime = 10, spinnerType = 'point') 
 
-
+# plays alert sound for soundFrequency times where soundFrequency is stored in data.json
 def alertSound():
 	beep = lambda x: os.system("echo -n '\a'; sleep 0.2;" * x)
 	soundFrequency = data['otherData']['soundFrequency']
@@ -607,43 +612,37 @@ def alertSound():
 	print('Played alert sound successfully')
 	richStatus(text = 'Played alert sound successfully', sleepTime = 10, spinnerType = 'point') 
 
-
+# launches the chrome driver and opens google classroom by default with loaded profile
 def loadDriver():
 	pathToChromeDriver = data['dir']['pathToChromeDriver']
 	driver = webdriver.Chrome(options = chromeOptions, executable_path = pathToChromeDriver)
 	driver.maximize_window()
-
 	print('Disabled extensions')
 	print('Turned off Location')
 	console.print('Turned off Camera', style = "bold red")
 	console.print('Turned off Microphone', style = "bold red")
 	print('Turned off Pop-up')
-
 	driver.get('https://classroom.google.com')
 	print('Opening Google Classroom')
 	richStatus(sleepTime = 5)
-
 	return driver
 
-	
+# used to login to gmail 
+# not used here as we used chrome profile
 def login():
 	pathToChromeDriver = data['dir']['pathToChromeDriver']
 	driver = webdriver.Chrome(options = chromeOptions, executable_path = pathToChromeDriver)
 	driver.maximize_window()
-
 	print('Disabled extensions')
 	print('Turned off Location')
 	console.print('Turned off Camera', style = "bold red")
 	console.print('Turned off Microphone', style = "bold red")
 	print('Turned off Pop-up')
-
 	print('Logging into ' + color.BOLD + 'Google account' + color.END)
 	driver.get('https://classroom.google.com/?emr=0')
 	time.sleep(3)
-
 	mailAddress = data['credentials']['mailAddress']
 	password = data['credentials']['password']
-
 	print('Entering mail address')
 	mailBox = driver.find_element_by_xpath(mailBoxXPath)
 	driver.implicitly_wait(10)
@@ -651,7 +650,6 @@ def login():
 	driver.find_element_by_xpath(nextButtonXPath).click()
 	driver.implicitly_wait(10)
 	time.sleep(2)
-
 	print(color.BOLD + 'Entering password' + color.END)
 	passwordBox = driver.find_element_by_xpath(enterPasswordBoxXPath)
 	driver.implicitly_wait(10)
@@ -659,12 +657,11 @@ def login():
 	driver.find_element_by_xpath(passwordNextButtonXPath).click()
 	driver.implicitly_wait(10)
 	time.sleep(2)
-
 	printInSameLine(sleepTime = 10)
 	print('Login Successful')
-
 	return driver
 
+# sends message to discord
 def discord(message):
 	url = data['credentials']['discordURL']
 	Message = {

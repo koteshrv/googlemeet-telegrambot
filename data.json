@@ -28,14 +28,13 @@
             "attendance",
             "54"
         ],
-        "minCountToJoin": 0,
-        "minCountToLeave": 2,
+        "minCountToJoin": 20,
+        "minCountToLeave": 35,
         "soundFrequency": 40,
         "responseMessage": "present sir",
         "linkPostedSeperatelyInAnnouncementTab": [
             "R&A",
-            "CN",
-            "TEST"
+            "CN"
         ]
     }
 }

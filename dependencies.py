@@ -27,14 +27,14 @@ class color:
 # fetch data from json and returns data
 # argument: file name of json
 def fetchDataFromJSON(fileName):
-	with open(fileName) as file:
+	with open('/home/koteshrv/.local/bin/' + fileName) as file:
 		data = json.load(file)
 	return data
 
 # export data to json
 # arguments: name of the file and data that we want to export
 def sendDataToJSON(fileName, data):
-	with open(fileName, 'w') as file:
+	with open('/home/koteshrv/.local/bin/' + fileName, 'w') as file:
 		json.dump(data, file, indent = 4)		
 
 
@@ -370,6 +370,12 @@ def updateTimeTable(day, period, classToUpdate):
 	sheet[colValues[colDict[period]] + str(rowValues[day])] = classToUpdate
 	timetablewb.save(classTimeTableLocation)
 
+# prints log data
+def printLog():
+	logData = fetchDataFromJSON('log.json')
+	print(json.dumps(logData, indent = 4))
+
+
 # prints the arguments and their uses 
 def helpFunction():
 	table = Table(show_lines=True)
@@ -379,6 +385,7 @@ def helpFunction():
 	table.add_row("--t", "displays todays timetable")
 	table.add_row("--h", "displays holidays list")
 	table.add_row("--c", "displays present class")
+	table.add_row("--log", "displays log")
 	table.add_row("--h -a", "add new holiday to the list and prints")
 	table.add_row("--h -r", "removes holiday from the list and prints")
 	table.add_row("--t -f", "displays complete timetable fetched from excel sheet")
@@ -537,6 +544,7 @@ def joinClass(subject, driver):
 	logData = fetchDataFromJSON('log.json')
 	# Reads the text from captions until str(count) > minCountToLeave:
 	while True:
+		wait.until(EC.visibility_of_element_located((By.XPATH, membersCountXPath)))
 		count = driver.find_element_by_xpath(membersCountXPath).text
 		printInSameLine('Members Count: ', count, sleepTime = 0, isChar = False)
 		try:
@@ -551,6 +559,8 @@ def joinClass(subject, driver):
 			for word in alertWords:
 				if word in captionTextLower:
 					discord("ALERT! Some one called you at " + str(datetime.now().time())[:8])
+					discord("Triggered word: " + word)
+					print("Triggered word: " + word)
 					printInSameLine(newLine = True)
 					print(text2art("ALERT", font = "small")) 
 					alertSound() # alert sound for soundCount times

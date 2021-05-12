@@ -179,6 +179,10 @@ elif argLen == 2:
 	elif arg == '--help':
 		helpFunction()
 
+	# prints the log data(data in log.json)
+	elif arg == '--log':
+		printLog()
+
 	else :
 		print(arg + " is not a command. See main.py --help")
 

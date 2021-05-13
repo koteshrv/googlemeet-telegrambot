@@ -115,7 +115,7 @@ if argLen == 1:
 				timeLeftForNextClass = subtractTime(nextClassStartTime, time)
 				hours, minutes = timeLeftForNextClass.split(':')
 				sleepTimeForNextClass = int(hours) * 60 + int(minutes)
-				printInSameLine(str1 = 'Lunch Time. Will trying again in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = sleepTimeForNextClass, color = "bold red", minutes = True)
+				printInSameLine(str1 = 'Lunch Time. Will try again in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = sleepTimeForNextClass, color = "bold red", minutes = True)
 			classAlreadyAttended = False
 			classAlreadyAttendedFlag = True
 

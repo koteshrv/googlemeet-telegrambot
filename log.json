@@ -29,11 +29,11 @@
         ],
         "Wednesday": [
             "CN",
-            "Java",
+            "JAVA",
             "MPMC",
             "Lunch",
-            "VLSI",
-            "DC"
+            "MWE",
+            "VLSI"
         ],
         "Thursday": [
             "MPMC",
@@ -60,15 +60,42 @@
     },
     "todaysTimeTable": {
         "09:00 - 10:00": "CN",
-        "10:00 - 11:00": "Java",
+        "10:00 - 11:00": "JAVA",
         "11:00 - 12:00": "MPMC",
         "12:00 - 13:00": "Lunch",
-        "13:00 - 14:00": "VLSI",
-        "14:00 - 15:00": "DC"
+        "13:00 - 14:00": "MWE",
+        "14:00 - 15:00": "VLSI"
     },
     "log": {
         "day": "Wednesday",
-        "joiningLeavingTime": {},
-        "classStatus": {}
+        "joiningLeavingTime": {
+            "09:00 - 10:00": {
+                "joining time": "09:36:51.241795",
+                "leaving time": "09:59:53.890464"
+            },
+            "10:00 - 11:00": {
+                "joining time": "10:18:50.788870",
+                "leaving time": "10:32:25.361913"
+            },
+            "10:00 - 12:00": {
+                "joining time": "10:44:15.768651",
+                "leaving time": "11:24:39.341819"
+            },
+            "11:00 - 12:00": {
+                "joining time": "11:44:46.479597",
+                "leaving time": "12:00:56.876119"
+            },
+            "13:00 - 14:00": {
+                "joining time": "13:22:27.142189",
+                "leaving time": "14:02:05.022407"
+            }
+        },
+        "classStatus": {
+            "09:00 - 10:00": "CN",
+            "10:00 - 11:00": "MPMC",
+            "11:00 - 12:00": "JAVA",
+            "12:00 - 13:00": "VLSI",
+            "13:00 - 14:00": "MWE"
+        }
     }
 }

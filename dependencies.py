@@ -346,6 +346,7 @@ def displayHolidaysList():
 	else :
 		console.print("You dont have any holidays", style = "bold gold1")
 
+# reverts to the original timetable
 def revertTimeTable():
 	jsonData = fetchDataFromJSON('log.json')
 	totalUpdates = len(list(jsonData["tempTimetableUpdate"].keys()))
@@ -386,8 +387,6 @@ def updateTimeTable(day, period, classToUpdate = None, previousClass = False):
 	if previousClass:
 		return prevClass
 	
-
-
 # prints log data
 def printLog():
 	logData = fetchDataFromJSON('log.json')

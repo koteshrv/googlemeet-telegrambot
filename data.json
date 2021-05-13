@@ -18,18 +18,25 @@
     "dir": {
         "pathToChromeDriver": "/home/koteshrv/.local/bin/chromedriver",
         "profilePath": "/home/koteshrv/.config/google-chrome/Profile 1",
-        "classTimeTableLocation": "/home/koteshrv/Desktop/Google-Meet-Automation/TimeTable.xlsx"
+        "classTimeTableLocation": "/home/koteshrv/.local/bin/TimeTable.xlsx"
     },
     "otherData": {
         "alertWords": [
             "koteswararao",
+            "Koteswararao",
+            "Koteswararao.",
+            "Koteswararao..",
             "454",
-            "attendance",
-            "54"
+            "454.",
+            "54",
+            "54",
+            "Attendance.",
+            "Attendance"
         ],
-        "minCountToJoin": 20,
-        "minCountToLeave": 35,
+        "minCountToJoin": 0,
+        "minCountToLeave": 2,
         "soundFrequency": 40,
+        "autoReply" : 0,
         "responseMessage": "present sir",
         "linkPostedSeperatelyInAnnouncementTab": [
             "R&A",

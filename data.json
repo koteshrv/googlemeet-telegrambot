@@ -13,12 +13,12 @@
     "credentials": {
         "mailAddress": "",
         "password": "",
-        "discordURL": "https://discordapp.com/api/webhooks/841095641261801503/2nLE0BrgE6sY1kyYuFLHfMzCDFskcE-ff3KULBNBuO8IkatEeEjRFiOZueKyu5zL5zJ5"
+        "discordURL": ""
     },
     "dir": {
         "pathToChromeDriver": "/home/koteshrv/.local/bin/chromedriver",
         "profilePath": "/home/koteshrv/.config/google-chrome/Profile 1",
-        "classTimeTableLocation": "/home/koteshrv/.local/bin/TimeTable.xlsx"
+        "classTimeTableLocation": "/home/koteshrv/.local/bin/timetable.xlsx"
     },
     "otherData": {
         "alertWords": [

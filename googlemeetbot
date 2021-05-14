@@ -1,4 +1,4 @@
-#!python
+#!/usr/bin/python3
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from rich.console import Console
@@ -12,272 +12,282 @@ argLen = len(sys.argv)
 # rich console
 console = Console()
 
-if argLen == 1:
+try:
+	if argLen == 1:
 
-	print(text2art("googlemeetbot", font = "small"))
+		print(text2art("googlemeetbot", font = "small"))
 
-	# Checking for previous day log
-	# If previous day log is present then it's cleared
-	dateAndTime = datetime.now()
-	day = dateAndTime.day
-	weekDay = dateAndTime.today().strftime('%A')
-	jsonData = fetchDataFromJSON('log.json')
-	if jsonData["log"]["day"] != weekDay:
-		jsonData["log"]["day"] = weekDay
-		jsonData["log"]["joiningLeavingTime"] = {}
-		jsonData["log"]["classStatus"] = {}
-	sendDataToJSON('log.json', jsonData)
+		# Checking for previous day log
+		# If previous day log is present then it's cleared
+		dateAndTime = datetime.now()
+		day = dateAndTime.day
+		weekDay = dateAndTime.today().strftime('%A')
+		jsonData = fetchDataFromJSON('log.json')
+		if jsonData["log"]["day"] != weekDay:
+			jsonData["log"]["day"] = weekDay
+			jsonData["log"]["joiningLeavingTime"] = {}
+			jsonData["log"]["classStatus"] = {}
+		sendDataToJSON('log.json', jsonData)
 
-	# checking for holiday
-	dateAndTime = datetime.now()
-	day = dateAndTime.day
-	noClasses = False
-	updateholidaysList()
-	loadTimeTable()
-	jsonData = fetchDataFromJSON('log.json')
-	holidaysDict = jsonData["holidaysList"]
-	classesTodayData = jsonData["todaysTimeTable"]
-	for holidayDate in holidaysDict:
-		if str(day) == holidayDate:
-			console.print('No classes today due to '+ holidaysDict[holidayDate], style = "bold red")
-			console.print('[bold][green]' + 'Done\n')
-			noClasses = True
-
-	if not noClasses:
-		# reverting the classes if previously changed
-		# if the timetable is temporarily changed then its reverted to original 
-		revertTimeTable()
-
-		# todays class list from the present time
-		# for suppose if we have classes from 9:00 to 4:00 and if we run this script at 10:00 
-		# then it will consider classes from 10:00 into classList
-		classesList = []
-		flag = False
-		for timings in classesTodayData:
-			# if current time is less than class start time then we should add all periods to the list
-			if compareTime(int(timings[0:2]), int(timings[3:5])): 
-				flag = True
-			# if we have a class in current time then we should add classes from now to the list
-			if compareTime(int(timings[0:2]), int(timings[3:5]), int(timings[8:10]), int(timings[11:]), True):
-				flag = True
-			if flag:
-				classesList.append(timings + ' '+ classesTodayData[timings])
-
-		completedClassesCount = len(classesTodayData) - len(classesList)
-
-		classesToday(printTable = True, printHoliday = False)
-
-		# get status for class joining
-		# if status is True: classwork is completed
-		# if status is false: classwork is scheduled for today
-		# if status if -1: classwork is going on at the moment
-		status = classStatus()
-
-		# if status is true: classwork is completed for today
-		if status == True:
-			console.print('All classes attended for today', style = "blink2 bold red")
-
-		# if status will be false when current time is less than start time of college so we wait here until status becomes -1	
-		if status == False:
-			jsonData = fetchDataFromJSON('log.json')
-			todaysTimeTable = jsonData["todaysTimeTable"]
-			timings = list(todaysTimeTable.keys())
-			startTime = timings[0][:5]
-			dateAndTime = datetime.now()
-			currentTime = dateAndTime.time()
-			time = str(currentTime)[:5]
-			timeForClass = subtractTime(startTime, time)
-			l = timeForClass.split(':')
-			timeToSleep = ((int(l[0]) * 60) + int(l[1]))
-			printInSameLine(str1 = 'You are early for the class. So I am sleeping for the next ', str2 = '', isChar = False, seconds = True, sleepTime = timeToSleep, color = "bold bright_yellow", minutes = True)
-			print(' ' * 80, end = '\r')
-
-		# if today is not a holiday and status is -1 that is classwork is going on 
-		if status == -1 or status == False:
-			classNow = whichClass()
-			totalclassesTodayData = len(classesList)
-			usedPrintInSameLine = False
-
-			# joins all classes that are stored in classesList
-			for i in range(totalclassesTodayData):
-				if usedPrintInSameLine:
-					printInSameLine(newLine = True)
-				classNow = whichClass()
-
-				# if current class returns "Lunch" then it sleeps until next class
-				if classNow == "Lunch":
-					nextClass = whichClass(nextClass = True, nextClassTime = True)
-					nextClassStartTime = nextClass[0][:5]
-					dateAndTime = datetime.now()
-					currentTime = dateAndTime.time()
-					time = str(currentTime)[:5]
-					timeLeftForNextClass = subtractTime(nextClassStartTime, time)
-					hours, minutes = timeLeftForNextClass.split(':')
-					sleepTimeForNextClass = int(hours) * 60 + int(minutes)
-					printInSameLine(str1 = 'Lunch Time. Will try again in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = sleepTimeForNextClass, color = "bold red", minutes = True)
-				classAlreadyAttended = False
-				classAlreadyAttendedFlag = True
-
-				# if current class is "None" then it will wait until next class
-				# current class returns "None" when we dont have any period or if we already attended the class
-				if classNow == None:
-					nextClass = whichClass(nextClass = True, nextClassTime = True)
-					nextClassStartTime = nextClass[0][:5]
-					dateAndTime = datetime.now()
-					currentTime = dateAndTime.time()
-					time = str(currentTime)[:5]
-					timeLeftForNextClass = subtractTime(nextClassStartTime, time)
-					hours, minutes = timeLeftForNextClass.split(':')
-					sleepTimeForNextClass = int(hours) * 60 + int(minutes)
-					printInSameLine(str1 = "No class to join at the moment! Trying again in ", str2 = '', isChar = False, seconds = True, sleepTime = sleepTimeForNextClass, minutes = True)
-					print(' ' * 80, end = '\r')
-
-				# joins current class and updates the log	
-				classNow = whichClass()
-				if usedPrintInSameLine:
-					printInSameLine(newLine = True)
-				console.print('\n' + classNow, style = "bold bright_yellow", end = '')
-				console.print(' class is going on at the moment\n', style = "bold")
-				driver = loadDriver()
-				print('Trying to join ' + classNow + ' class')
-				joinClass(subject = classNow, driver = driver)
-				jsonData = fetchDataFromJSON('log.json')
-				t = jsonData["todaysTimeTable"]
-				classTime = list(t.keys())
-				periods = {}
-				if classTime[i + completedClassesCount] in periods:
-					periods[classTime[i + completedClassesCount]].update(classNow)
-				else :
-					periods[classTime[i + completedClassesCount]] = classNow
-
-				jsonData["log"]["classStatus"].update(periods)
-				sendDataToJSON('log.json', jsonData)
-
-			console.print("Attened all classes successfully!", style = "BLINK2 bold red")
-
-
-elif argLen == 2:
-	arg = sys.argv[1].lower()
-
-	# loads the timetable and prints todays timetable
-	if arg == '--t':
+		# checking for holiday
+		dateAndTime = datetime.now()
+		day = dateAndTime.day
+		noClasses = False
+		updateholidaysList()
 		loadTimeTable()
-		classesToday(printTable = True)
+		jsonData = fetchDataFromJSON('log.json')
+		holidaysDict = jsonData["holidaysList"]
+		classesTodayData = jsonData["todaysTimeTable"]
+		for holidayDate in holidaysDict:
+			if str(day) == holidayDate:
+				console.print('No classes today due to '+ holidaysDict[holidayDate], style = "bold red")
+				console.print('[bold][green]' + 'Done\n')
+				noClasses = True
 
-	# uses class url to join the class immediately
-	elif arg == '--l':
-		print(text2art("googlemeetbot", font = "small"))
-		classLink = input(color.BOLD + color.YELLOW + 'Enter the class link: ' + color.END)
-		driver = loadDriver()
-		print('Trying to join the class from the link')
-		joinClass(driver, URL = classLink)
+		if not noClasses:
+			# reverting the classes if previously changed
+			# if the timetable is temporarily changed then its reverted to original 
+			revertTimeTable()
 
-	# prints the holidays list
-	elif arg == '--h':
-		displayHolidaysList()
+			# todays class list from the present time
+			# for suppose if we have classes from 9:00 to 4:00 and if we run this script at 10:00 
+			# then it will consider classes from 10:00 into classList
+			classesList = []
+			flag = False
+			for timings in classesTodayData:
+				# if current time is less than class start time then we should add all periods to the list
+				if compareTime(int(timings[0:2]), int(timings[3:5])): 
+					flag = True
+				# if we have a class in current time then we should add classes from now to the list
+				if compareTime(int(timings[0:2]), int(timings[3:5]), int(timings[8:10]), int(timings[11:]), True):
+					flag = True
+				if flag:
+					classesList.append(timings + ' '+ classesTodayData[timings])
 
-	# loads the timetable and prints the current class
-	# if there is no class at the moment, then it returns "None"
-	elif arg == '--c':
-		print(color.CYAN + str(whichClass()) + color.END)
+			completedClassesCount = len(classesTodayData) - len(classesList)
 
-	# prints all arguments and their uses
-	elif arg == '--help':
-		helpFunction()
+			classesToday(printTable = True, printHoliday = False)
 
-	# prints the log data(data in log.json)
-	elif arg == '--log':
-		printLog()
+			# get status for class joining
+			# if status is True: classwork is completed
+			# if status is false: classwork is scheduled for today
+			# if status if -1: classwork is going on at the moment
+			status = classStatus()
 
-	else :
-		print(arg + " is not a command. See googlemeetbot --help")
+			# if status is true: classwork is completed for today
+			if status == True:
+				console.print('All classes attended for today', style = "blink2 bold red")
 
-elif argLen == 3:
-	arg1 = sys.argv[1].lower()
-	arg2 = sys.argv[2].lower()
-	# uses class url to join the class and schedules at specified 'time'
-	if arg1 == '--l':
-		print(text2art("googlemeetbot", font = "small"))
-		hours, minutes = arg2.split(':')
-		print(color.YELLOW + 'If you want to schedule the class at ' + color.END + color.BOLD + color.GREEN +  hours + ' hr ' + minutes + ' min' + color.END)
-		decision = input(color.GREEN + 'Do you want to schedule[Y/n]: ' + color.END)
-		if decision == 'Y' or decision == 'y':
+			# if status will be false when current time is less than start time of college so we wait here until status becomes -1	
+			if status == False:
+				jsonData = fetchDataFromJSON('log.json')
+				todaysTimeTable = jsonData["todaysTimeTable"]
+				timings = list(todaysTimeTable.keys())
+				startTime = timings[0][:5]
+				dateAndTime = datetime.now()
+				currentTime = dateAndTime.time()
+				time = str(currentTime)[:5]
+				timeForClass = subtractTime(startTime, time)
+				l = timeForClass.split(':')
+				timeToSleep = ((int(l[0]) * 60) + int(l[1]))
+				printInSameLine(str1 = 'You are early for the class. So I am sleeping for the next ', str2 = '', isChar = False, seconds = True, sleepTime = timeToSleep, color = "bold bright_yellow", minutes = True)
+				print(' ' * 80, end = '\r')
+
+			# if today is not a holiday and status is -1 that is classwork is going on 
+			if status == -1 or status == False:
+				classNow = whichClass()
+				totalclassesTodayData = len(classesList)
+				usedPrintInSameLine = False
+
+				# joins all classes that are stored in classesList
+				for i in range(totalclassesTodayData):
+					if usedPrintInSameLine:
+						printInSameLine(newLine = True)
+					classNow = whichClass()
+
+					# if current class returns "Lunch" then it sleeps until next class
+					if classNow == "Lunch":
+						nextClass = whichClass(nextClass = True, nextClassTime = True)
+						nextClassStartTime = nextClass[0][:5]
+						dateAndTime = datetime.now()
+						currentTime = dateAndTime.time()
+						time = str(currentTime)[:5]
+						timeLeftForNextClass = subtractTime(nextClassStartTime, time)
+						hours, minutes = timeLeftForNextClass.split(':')
+						sleepTimeForNextClass = int(hours) * 60 + int(minutes)
+						printInSameLine(str1 = 'Lunch Time. Will try again in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = sleepTimeForNextClass, color = "bold red", minutes = True)
+					classAlreadyAttended = False
+					classAlreadyAttendedFlag = True
+
+					# if current class is "None" then it will wait until next class
+					# current class returns "None" when we dont have any period or if we already attended the class
+					if classNow == None:
+						nextClass = whichClass(nextClass = True, nextClassTime = True)
+						nextClassStartTime = nextClass[0][:5]
+						dateAndTime = datetime.now()
+						currentTime = dateAndTime.time()
+						time = str(currentTime)[:5]
+						timeLeftForNextClass = subtractTime(nextClassStartTime, time)
+						hours, minutes = timeLeftForNextClass.split(':')
+						sleepTimeForNextClass = int(hours) * 60 + int(minutes)
+						printInSameLine(str1 = "No class to join at the moment! Trying again in ", str2 = '', isChar = False, seconds = True, sleepTime = sleepTimeForNextClass, minutes = True)
+						print(' ' * 80, end = '\r')
+
+					# joins current class and updates the log	
+					classNow = whichClass()
+					if usedPrintInSameLine:
+						printInSameLine(newLine = True)
+					console.print('\n' + classNow, style = "bold bright_yellow", end = '')
+					console.print(' class is going on at the moment\n', style = "bold")
+					driver = loadDriver()
+					print('Trying to join ' + classNow + ' class')
+					joinClass(subject = classNow, driver = driver)
+					jsonData = fetchDataFromJSON('log.json')
+					t = jsonData["todaysTimeTable"]
+					classTime = list(t.keys())
+					periods = {}
+					if classTime[i + completedClassesCount] in periods:
+						periods[classTime[i + completedClassesCount]].update(classNow)
+					else :
+						periods[classTime[i + completedClassesCount]] = classNow
+
+					jsonData["log"]["classStatus"].update(periods)
+					sendDataToJSON('log.json', jsonData)
+
+				console.print("Attened all classes successfully!", style = "BLINK2 bold red")
+
+
+	elif argLen == 2:
+		arg = sys.argv[1].lower()
+
+		# loads the timetable and prints todays timetable
+		if arg == '--t':
+			loadTimeTable()
+			classesToday(printTable = True)
+
+		# uses class url to join the class immediately
+		elif arg == '--l':
+			print(text2art("googlemeetbot", font = "small"))
 			classLink = input(color.BOLD + color.YELLOW + 'Enter the class link: ' + color.END)
-			dateAndTime = datetime.now()
-			currentTime = dateAndTime.time()
-			currentTime = str(currentTime)[:5]
-			timeLeft = subtractTime(arg2, currentTime)
-			hours, minutes = timeLeft.split(':')
-			sleepTimeForNextClass = int(hours) * 60 + int(minutes)
-			printInSameLine(str1 = 'Class is scheduled successfully. Will join the class in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = sleepTimeForNextClass, color = "bold red", minutes = True)
-			printInSameLine(newLine = True)
 			driver = loadDriver()
 			print('Trying to join the class from the link')
 			joinClass(driver, URL = classLink)
+
+		# prints the holidays list
+		elif arg == '--h':
+			displayHolidaysList()
+
+		# loads the timetable and prints the current class
+		# if there is no class at the moment, then it returns "None"
+		elif arg == '--c':
+			print(color.CYAN + str(whichClass()) + color.END)
+
+		# prints all arguments and their uses
+		elif arg == '--help':
+			helpFunction()
+
+		# prints the log data(data in log.json)
+		elif arg == '--log':
+			printLog()
+
 		else :
-			print(color.BOLD + color.RED + 'Aborted' + color.END)
+			print(arg + " is not a command. See googlemeetbot --help")
 
-		
-
-	# add holiday to the holiday list
-	elif arg1 == '--h' and arg2 == '-a':
-		date, occasion = input("Enter holiday and occasion: ").split()
-		updateholidaysList(date, occasion)
-		data = fetchDataFromJSON('log.json')
-		displayHolidaysList()
-
-	# remove holiday from the holiday list
-	elif arg1 == '--h' and arg2 == '-r':
-		date = input("Enter the date you wanted to remove: ")
-		updateholidaysList(date, remove = True)
-		data = fetchDataFromJSON('log.json')
-		displayHolidaysList()
-
-	# prints complete timetable
-	elif arg1 == '--t' and arg2 == '-f':
-		displayTimeTable()
-
-	# updates timetable
-	elif arg1 == '--t' and arg2 == '-u':
-		displayTimeTable()
-		count = input("Enter number of classes you want to update: ")
-		for i in range(int(count)):
-			day, classTime = input("Enter day and period you want to change: ").split()
-			classToUpdate = input("Enter the class name you want to change: ")
-			updateTimeTable(day, classTime, classToUpdate)
-		displayTimeTable()
-
-	elif arg1 == '--t' and arg2 == '-ut':
-		data = fetchDataFromJSON('log.json')
-		dateAndTime = datetime.now()
-		weekDay = dateAndTime.today().strftime('%A').lower()
-		tempTimetableUpdateData = data["tempTimetableUpdate"]
-		tempTimetableUpdateKeys = list(tempTimetableUpdateData.keys())
-		displayTimeTable()
-		count = input("Enter number of classes you want to update: ")
-		for i in range(int(count)):
-			day, classTime = input("Enter day and period you want to change: ").split()
-			classToUpdate = input("Enter the class name you want to change: ")
-			previousClass = updateTimeTable(day, classTime, classToUpdate, previousClass = True)
-			if len(tempTimetableUpdateKeys) == 0:
-				tempTimetableUpdateData[str(i)] = {
-					"day" : day,
-					"period" : classTime,
-					"classToUpdate" : classToUpdate,
-					"previousClass" : previousClass
-				}
+	elif argLen == 3:
+		arg1 = sys.argv[1].lower()
+		arg2 = sys.argv[2].lower()
+		# uses class url to join the class and schedules at specified 'time'
+		if arg1 == '--l':
+			print(text2art("googlemeetbot", font = "small"))
+			hours, minutes = arg2.split(':')
+			print(color.YELLOW + 'If you want to schedule the class at ' + color.END + color.BOLD + color.GREEN +  hours + ' hr ' + minutes + ' min' + color.END)
+			decision = input(color.GREEN + 'Do you want to schedule[Y/n]: ' + color.END)
+			if decision == 'Y' or decision == 'y':
+				classLink = input(color.BOLD + color.YELLOW + 'Enter the class link: ' + color.END)
+				dateAndTime = datetime.now()
+				currentTime = dateAndTime.time()
+				currentTime = str(currentTime)[:5]
+				timeLeft = subtractTime(arg2, currentTime)
+				hours, minutes = timeLeft.split(':')
+				sleepTimeForNextClass = int(hours) * 60 + int(minutes)
+				printInSameLine(str1 = 'Class is scheduled successfully. Will join the class in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = sleepTimeForNextClass, color = "bold red", minutes = True)
+				printInSameLine(newLine = True)
+				driver = loadDriver()
+				print('Trying to join the class from the link')
+				joinClass(driver, URL = classLink)
 			else :
-				tempTimetableUpdateData[str(int(tempTimetableUpdateKeys[-1]) + i + 1)] = {
-					"day" : day,
-					"period" : classTime,
-					"classToUpdate" : classToUpdate,
-					"previousClass" : previousClass
-				}
-			data["tempTimetableUpdate"].update(tempTimetableUpdateData)
-		sendDataToJSON('log.json', data)
-		displayTimeTable()
+				print(color.BOLD + color.RED + 'Aborted' + color.END)
 
-	else :
-		print("googlemeetbot " + arg1 + " " + arg2 + " is not a command. See googlemeetbot --help")		
+			
+
+		# add holiday to the holiday list
+		elif arg1 == '--h' and arg2 == '-a':
+			date, occasion = input("Enter holiday and occasion: ").split()
+			updateholidaysList(date, occasion)
+			data = fetchDataFromJSON('log.json')
+			displayHolidaysList()
+
+		# remove holiday from the holiday list
+		elif arg1 == '--h' and arg2 == '-r':
+			date = input("Enter the date you wanted to remove: ")
+			updateholidaysList(date, remove = True)
+			data = fetchDataFromJSON('log.json')
+			displayHolidaysList()
+
+		# prints complete timetable
+		elif arg1 == '--t' and arg2 == '-f':
+			displayTimeTable()
+
+		# updates timetable
+		elif arg1 == '--t' and arg2 == '-u':
+			displayTimeTable()
+			count = input("Enter number of classes you want to update: ")
+			for i in range(int(count)):
+				day, classTime = input("Enter day and period you want to change: ").split()
+				classToUpdate = input("Enter the class name you want to change: ")
+				updateTimeTable(day, classTime, classToUpdate)
+			displayTimeTable()
+
+		elif arg1 == '--t' and arg2 == '-ut':
+			data = fetchDataFromJSON('log.json')
+			dateAndTime = datetime.now()
+			weekDay = dateAndTime.today().strftime('%A').lower()
+			tempTimetableUpdateData = data["tempTimetableUpdate"]
+			tempTimetableUpdateKeys = list(tempTimetableUpdateData.keys())
+			displayTimeTable()
+			count = input("Enter number of classes you want to update: ")
+			for i in range(int(count)):
+				day, classTime = input("Enter day and period you want to change: ").split()
+				classToUpdate = input("Enter the class name you want to change: ")
+				previousClass = updateTimeTable(day, classTime, classToUpdate, previousClass = True)
+				if len(tempTimetableUpdateKeys) == 0:
+					tempTimetableUpdateData[str(i)] = {
+						"day" : day,
+						"period" : classTime,
+						"classToUpdate" : classToUpdate,
+						"previousClass" : previousClass
+					}
+				else :
+					tempTimetableUpdateData[str(int(tempTimetableUpdateKeys[-1]) + i + 1)] = {
+						"day" : day,
+						"period" : classTime,
+						"classToUpdate" : classToUpdate,
+						"previousClass" : previousClass
+					}
+				data["tempTimetableUpdate"].update(tempTimetableUpdateData)
+			sendDataToJSON('log.json', data)
+			displayTimeTable()
+
+		else :
+			print("googlemeetbot " + arg1 + " " + arg2 + " is not a command. See googlemeetbot --help")		
 
 	
+
+except KeyboardInterrupt:
+	print(' ' * 150)
+	print('Interrupted')
+	try:
+		sys.exit(0)
+	except SystemExit:
+		os._exit(0)
+

@@ -14,7 +14,7 @@ console = Console()
 
 if argLen == 1:
 
-	print(text2art("Google Meet Bot", font = "small"))
+	print(text2art("googlemeetbot", font = "small"))
 
 	# Checking for previous day log
 	# If previous day log is present then it's cleared
@@ -166,7 +166,7 @@ elif argLen == 2:
 
 	# uses class url to join the class immediately
 	elif arg == '--l':
-		print(text2art("Google Meet Bot", font = "small"))
+		print(text2art("googlemeetbot", font = "small"))
 		classLink = input(color.BOLD + color.YELLOW + 'Enter the class link: ' + color.END)
 		driver = loadDriver()
 		print('Trying to join the class from the link')
@@ -197,7 +197,7 @@ elif argLen == 3:
 	arg2 = sys.argv[2].lower()
 	# uses class url to join the class and schedules at specified 'time'
 	if arg1 == '--l':
-		print(text2art("Google Meet Bot", font = "small"))
+		print(text2art("googlemeetbot", font = "small"))
 		hours, minutes = arg2.split(':')
 		print(color.YELLOW + 'If you want to schedule the class at ' + color.END + color.BOLD + color.GREEN +  hours + ' hr ' + minutes + ' min' + color.END)
 		decision = input(color.GREEN + 'Do you want to schedule[Y/n]: ' + color.END)

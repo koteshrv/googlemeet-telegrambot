@@ -46,6 +46,9 @@ This bot can be used to attend all online classes with a single command.
 
 ## Some command previews
 
+### Discord Notifications
+![discord](https://github.com/koteshrv/googlemeetbot/blob/main/images/7.png)  
+
 ### Schedule of today's classes  
 ![classtimetable](https://github.com/koteshrv/googlemeetbot/blob/main/images/5.png)  
 

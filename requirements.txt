@@ -1,0 +1,5 @@
+openpyxl==3.0.7
+requests==2.22.0
+art==5.2
+selenium==3.141.0
+rich==10.2.0

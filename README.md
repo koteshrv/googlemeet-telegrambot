@@ -4,7 +4,7 @@ This bot can be used to attend all online classes with a single command.
 ## Some features of googlemeetbot  
 
 1. It can automatically fetch link from google classroom from both meetlink or from announcement tab.
-2. Using chrome profile. So no need to login everytime.
+2. No need to login to google account every time we use googlemeetbot.
 3. It can differenciate the link posted in announcement tab. Then joins the class if link is posted today. 
 4. It can join the class when the members count is greater than minCountToJoin(defined in data.json). 
 5. If members count is not available, then it joins automatically.

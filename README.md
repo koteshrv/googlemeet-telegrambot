@@ -39,8 +39,9 @@ This bot can be used to attend all online classes with a single command.
     class.
 12. Update the alertwords present in data.json according to your choice.
 13. Set `autoReply` to `1`, if you want autoreply feature when someone calls you.
-14. Append current repository path before `fileName` in `fetchDataFromJSON` and `sendDataToJSON` from `dependencies.py`.
-15. After completing the setup, If you are using linux, then move all the files of the repository to `/home/username/.local/bin/`.  
+14. Set `windowsUser` to `1`, if you are a windows user.
+15. Append current repository path before `fileName` in `fetchDataFromJSON` and `sendDataToJSON` from `dependencies.py`.
+16. After completing the setup, If you are using linux, then move all the files of the repository to `/home/username/.local/bin/`.  
     If you are using windows, then add the repository to path.
 15. Now change dir path of `pathToChromeDriver` that is present in the repository and `classTimeTableLocation` path in the data.json.  
 16. If you are a linux user and if you moved the dir to `/home/username/.local/bin/`, then `pathToChromeDriver` is `/home/username/.local/bin/chromedriver` and `classTimeTableLocation` is `/home/username/.local/bin/timetable.xlsx`.  
@@ -48,9 +49,6 @@ This bot can be used to attend all online classes with a single command.
 18. If you are a windows user change the shebang(first line) in `googlemeetbot` to `#!python`.
 19. And use git bash to run all the commands. (Not required if you dont want to run globally)
 20. Now the setup is complete!
-
-
-## Some command previews
 
 ### Discord Notifications
 ![discord](https://github.com/koteshrv/googlemeetbot/blob/main/images/7.png)  

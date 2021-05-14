@@ -8,7 +8,7 @@ from selenium import webdriver
 from datetime import datetime
 from rich.table import Table
 from art import *
-import openpyxl, calendar, requests, json, time, sys, os, re
+import openpyxl, calendar, requests, json, time, sys, os, re, winsound
 
 
 class color:
@@ -27,14 +27,14 @@ class color:
 # fetch data from json and returns data
 # argument: file name of json
 def fetchDataFromJSON(fileName):
-	with open('/home/koteshrv/.local/bin/' + fileName) as file:
+	with open('C:\\googlemeetbot\\' + fileName) as file:
 		data = json.load(file)
 	return data
 
 # export data to json
 # arguments: name of the file and data that we want to export
 def sendDataToJSON(fileName, data):
-	with open('/home/koteshrv/.local/bin/' + fileName, 'w') as file:
+	with open('C:\\googlemeetbot\\' + fileName, 'w') as file:
 		json.dump(data, file, indent = 4)		
 
 
@@ -562,7 +562,7 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 	element = wait.until(EC.element_to_be_clickable((By.XPATH, captionsButtonXPath)))
 	element.click()
 	print('Turning on captions')
-	alertSound(frequency = False)
+	alertSoundInWindows(frequency = False)
 	if URL == None:
 		# sending class joining time to discord
 		discord("Joined " + subject + " class at " + str(datetime.now().time())[:8])
@@ -580,7 +580,7 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 
 	else :
 		# sending class joining time to discord
-		discord('Joined the class with ' + url + ' successfully at ' + str(datetime.now().time())[:8])
+		discord('Joined the class with ' + URL + ' successfully at ' + str(datetime.now().time())[:8])
 	# counting number of students joined 
 	count = driver.find_element_by_xpath(membersCountXPath).text
 	flag = False
@@ -610,13 +610,13 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 					print("Triggered word: " + word)
 					printInSameLine(newLine = True)
 					print(text2art("ALERT", font = "small")) 
-					alertSound() # alert sound for soundCount times
+					alertSoundInWindows() # alert sound for soundCount times
 					if autoReply:
 						responseMessage = data['otherData']['responseMessage']
 						sendMessageInChatBox(driver, responseMessage)	
 			# leaves the class when class count is less than minCountToLeave
 			if count < str(minCountToLeave) and flag :
-				alertSound(frequency = False)
+				alertSoundInWindows(frequency = False)
 				if URL == None:
 					discord("Left the " + subject + " class at " + str(datetime.now().time())[:8])
 					joiningLeavingTimeDict["leaving time"] = str(datetime.now().time())
@@ -629,7 +629,7 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 					console.print('\nLeft the class successfully', style = "bold red", end = '\r')	
 					break
 				else :
-					discord('Left the class of url ' + url + ' successfully at ' + str(datetime.now().time())[:8])
+					discord('Left the class of url ' + URL + ' successfully at ' + str(datetime.now().time())[:8])
 					driver.close()
 					console.print('\nLeft the class successfully', style = "bold red")	
 					break
@@ -642,7 +642,7 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 				flag = True
 			# leaves the class when class count is less than minCountToLeave
 			if count < str(minCountToLeave) and flag :
-				alertSound(frequency = False)
+				alertSoundInWindows(frequency = False)
 				if URL == None:
 					discord("Left the " + subject + " class at " + str(datetime.now().time())[:8])
 					joiningLeavingTimeDict["leaving time"] = str(datetime.now().time())
@@ -655,7 +655,7 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 					console.print('\nLeft the class successfully', style = "bold red", end = '\r')
 					break
 				else :
-					discord('Left the class of url ' + url + ' successfully at ' + str(datetime.now().time())[:8])
+					discord('Left the class of url ' + URL + ' successfully at ' + str(datetime.now().time())[:8])
 					driver.close()
 					console.print('\nLeft the class successfully', style = "blink2 bold red")
 					break
@@ -675,8 +675,21 @@ def sendMessageInChatBox(driver, message):
 	time.sleep(1)
 	driver.find_element_by_xpath(chatBoxCloseXPath).click()
 	driver.implicitly_wait(10)
-	print('Responded to the class by sending ', color.BOLD + responseMessage + color.END)
+	print('Responded to the class by sending ', color.BOLD + message + color.END)
 	richStatus(text = 'Message sent successfully', sleepTime = 10, spinnerType = 'point') 
+
+# plays alert sound for soundFrequency times where soundFrequency is stored in data.json
+def alertSoundInWindows(frequency = True):
+	if frequency:
+		soundFrequency = data['otherData']['soundFrequency']
+		for i in range(soundFrequency):
+			winsound.Beep(1000, 1000)
+			time.sleep(0.5)
+		richStatus(text = 'Played alert sound successfully', sleepTime = 10, spinnerType = 'point') 	
+	else:
+		for i in range(2):
+			winsound.Beep(1000, 1000)
+			time.sleep(0.5)
 
 # plays alert sound for soundFrequency times where soundFrequency is stored in data.json
 def alertSound(frequency = True):

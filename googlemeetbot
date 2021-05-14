@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!python
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from rich.console import Console
@@ -170,7 +170,7 @@ elif argLen == 2:
 		classLink = input(color.BOLD + color.YELLOW + 'Enter the class link: ' + color.END)
 		driver = loadDriver()
 		print('Trying to join the class from the link')
-		joinClass(driver, url = classLink)
+		joinClass(driver, URL = classLink)
 
 	# prints the holidays list
 	elif arg == '--h':
@@ -213,7 +213,7 @@ elif argLen == 3:
 			printInSameLine(newLine = True)
 			driver = loadDriver()
 			print('Trying to join the class from the link')
-			joinClass(driver, url = classLink)
+			joinClass(driver, URL = classLink)
 		else :
 			print(color.BOLD + color.RED + 'Aborted' + color.END)
 

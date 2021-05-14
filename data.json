@@ -27,6 +27,7 @@
             "Attendance.",
             "Attendance"
         ],
+        "windowsUser" : 0,
         "minCountToJoin": 20,
         "minCountToLeave": 35,
         "soundFrequency": 40,

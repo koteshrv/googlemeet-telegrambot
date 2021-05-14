@@ -8,7 +8,7 @@ from selenium import webdriver
 from datetime import datetime
 from rich.table import Table
 from art import *
-import openpyxl, calendar, requests, json, time, sys, os, re, winsound
+import openpyxl, calendar, requests, json, time, sys, os, re
 
 
 class color:
@@ -37,9 +37,11 @@ def sendDataToJSON(fileName, data):
 	with open('C:\\googlemeetbot\\' + fileName, 'w') as file:
 		json.dump(data, file, indent = 4)		
 
-
 data = fetchDataFromJSON('data.json')
 profilePath = data['dir']['profilePath']
+windowsUser = data["otherData"]["windowsUser"]
+if windowsUser:
+    import winsound
 
 # rich console
 # https://github.com/willmcgugan/rich
@@ -562,7 +564,7 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 	element = wait.until(EC.element_to_be_clickable((By.XPATH, captionsButtonXPath)))
 	element.click()
 	print('Turning on captions')
-	alertSoundInWindows(frequency = False)
+	alertSound(frequency = False)
 	if URL == None:
 		# sending class joining time to discord
 		discord("Joined " + subject + " class at " + str(datetime.now().time())[:8])
@@ -610,13 +612,13 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 					print("Triggered word: " + word)
 					printInSameLine(newLine = True)
 					print(text2art("ALERT", font = "small")) 
-					alertSoundInWindows() # alert sound for soundCount times
+					alertSound() # alert sound for soundCount times
 					if autoReply:
 						responseMessage = data['otherData']['responseMessage']
 						sendMessageInChatBox(driver, responseMessage)	
 			# leaves the class when class count is less than minCountToLeave
 			if count < str(minCountToLeave) and flag :
-				alertSoundInWindows(frequency = False)
+				alertSound(frequency = False)
 				if URL == None:
 					discord("Left the " + subject + " class at " + str(datetime.now().time())[:8])
 					joiningLeavingTimeDict["leaving time"] = str(datetime.now().time())
@@ -642,7 +644,7 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 				flag = True
 			# leaves the class when class count is less than minCountToLeave
 			if count < str(minCountToLeave) and flag :
-				alertSoundInWindows(frequency = False)
+				alertSound(frequency = False)
 				if URL == None:
 					discord("Left the " + subject + " class at " + str(datetime.now().time())[:8])
 					joiningLeavingTimeDict["leaving time"] = str(datetime.now().time())
@@ -677,29 +679,30 @@ def sendMessageInChatBox(driver, message):
 	driver.implicitly_wait(10)
 	print('Responded to the class by sending ', color.BOLD + message + color.END)
 	richStatus(text = 'Message sent successfully', sleepTime = 10, spinnerType = 'point') 
-
-# plays alert sound for soundFrequency times where soundFrequency is stored in data.json
-def alertSoundInWindows(frequency = True):
-	if frequency:
-		soundFrequency = data['otherData']['soundFrequency']
-		for i in range(soundFrequency):
-			winsound.Beep(1000, 1000)
-			time.sleep(0.5)
-		richStatus(text = 'Played alert sound successfully', sleepTime = 10, spinnerType = 'point') 	
-	else:
-		for i in range(2):
-			winsound.Beep(1000, 1000)
-			time.sleep(0.5)
+	
 
 # plays alert sound for soundFrequency times where soundFrequency is stored in data.json
 def alertSound(frequency = True):
-	beep = lambda x: os.system("echo -n '\a'; sleep 0.2;" * x)
-	if frequency:
-		soundFrequency = data['otherData']['soundFrequency']
-		beep(soundFrequency)
-		richStatus(text = 'Played alert sound successfully', sleepTime = 10, spinnerType = 'point') 	
+	if not windowsUser:
+		beep = lambda x: os.system("echo -n '\a'; sleep 0.2;" * x)
+		if frequency:
+			soundFrequency = data['otherData']['soundFrequency']
+			beep(soundFrequency)
+			richStatus(text = 'Played alert sound successfully', sleepTime = 10, spinnerType = 'point') 	
+		else:
+			beep(2)
+
 	else:
-		beep(2)
+		if frequency:
+			soundFrequency = data['otherData']['soundFrequency']
+			for i in range(soundFrequency):
+				winsound.Beep(1000, 1000)
+				time.sleep(0.5)
+			richStatus(text = 'Played alert sound successfully', sleepTime = 10, spinnerType = 'point') 	
+		else:
+			for i in range(2):
+				winsound.Beep(1000, 1000)
+				time.sleep(0.5)
 	
 
 # launches the chrome driver and opens google classroom if needed with loaded profile

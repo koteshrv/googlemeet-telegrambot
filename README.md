@@ -27,7 +27,7 @@ This bot can be used to attend all online classes with a single command.
 3. Now create a new chrome profile and copy the profile path as shown [here](https://stackoverflow.com/questions/52394408/how-to-use-chrome-profile-in-selenium-webdriver-python-3#answer-61336851).
 4. Now copy the profile path to `profilePath` present in data.json.
 5. Modify the timetable.xlsx with your class timetable and use 24 hour format for class time.
-6. For example, if you have class from `9:30 AM to 10:30 AM` then change it as `09:30 : 10:30`. 
+6. For example, if you have class from `9:30 AM to 10:30 AM` then change it to `09:30 : 10:30`. 
 7. In `classroomLinks` present in data.json, paste all your classroom links with subject as keys and url as value.
 8. If some class links are posted in announcement tab, add the subjects in `linkPostedSeperatelyInAnnouncementTab` present in data.json.
 9. Create a discord webhook. If you dont know how to create a discord webhook, then follow the steps [here](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks).

@@ -13,4 +13,9 @@ This can be used to attend all online classes with a single command.
     9. Auto responds with responseMessage when someone calls you. (can be turned off if not required).
     10. Fetches the class schedule from timetable.xlsx and updates when you want to change timetable.
 
+## googlemeetbot commands
+![commands](https://github.com/koteshrv/googlemeetbot/blob/main/images/3.png)
 
+## Steps required to use googlemeetbot
+    1. Download google chrome driver from [here](https://sites.google.com/a/chromium.org/chromedriver/downloads)
+    

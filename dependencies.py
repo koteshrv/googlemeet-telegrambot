@@ -267,16 +267,28 @@ def classesToday(printTable = False, printHoliday = True):
 			table.add_column("Status", justify = "center", style = "magenta")
 			classFlag = False
 			for i in range(len(classtime)):
-				if (not classFlag) and compareTime(int(classtime[i][0:2]), int(classtime[i][3:5])):
-					table.add_row(classtime[i], classes[i], "[bold magenta] Scheduled [green]:hourglass:")
-				elif compareTime(int(classtime[i][0:2]), int(classtime[i][3:5]), int(classtime[i][8:10]), int(classtime[i][11:]), True) and (not(classtime[i] in classesAlreadyAttended)):
-					table.add_row(classtime[i], classes[i], "[bold magenta] ONGOING [green]:hourglass:")
-					classFlag = True
+				if windowsUser:
+					if (not classFlag) and compareTime(int(classtime[i][0:2]), int(classtime[i][3:5])):
+						table.add_row(classtime[i], classes[i], "[bold magenta] Scheduled ")
+					elif compareTime(int(classtime[i][0:2]), int(classtime[i][3:5]), int(classtime[i][8:10]), int(classtime[i][11:]), True) and (not(classtime[i] in classesAlreadyAttended)):
+						table.add_row(classtime[i], classes[i], "[bold magenta] ONGOING ")
+						classFlag = True
+					else:
+						if classFlag == True:
+							table.add_row(classtime[i], classes[i])
+						else :
+							table.add_row(classtime[i], classes[i], "[bold magenta]COMPLETED ")
 				else:
-					if classFlag == True:
-						table.add_row(classtime[i], classes[i])
-					else :
-						table.add_row(classtime[i], classes[i], "[bold magenta]COMPLETED [green]:heavy_check_mark:")
+					if (not classFlag) and compareTime(int(classtime[i][0:2]), int(classtime[i][3:5])):
+						table.add_row(classtime[i], classes[i], "[bold magenta] Scheduled [green]:hourglass:")
+					elif compareTime(int(classtime[i][0:2]), int(classtime[i][3:5]), int(classtime[i][8:10]), int(classtime[i][11:]), True) and (not(classtime[i] in classesAlreadyAttended)):
+						table.add_row(classtime[i], classes[i], "[bold magenta] ONGOING [green]:hourglass:")
+						classFlag = True
+					else:
+						if classFlag == True:
+							table.add_row(classtime[i], classes[i])
+						else :
+							table.add_row(classtime[i], classes[i], "[bold magenta]COMPLETED [green]:heavy_check_mark:")
 			console.print(table)
 			print()
 

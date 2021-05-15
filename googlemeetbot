@@ -130,7 +130,8 @@ try:
 						print(' ' * 80, end = '\r')
 
 					# joins current class and updates the log	
-					classNow = whichClass()
+					while classNow == None:
+						classNow = whichClass()
 					if usedPrintInSameLine:
 						printInSameLine(newLine = True)
 					console.print('\n' + classNow, style = "bold bright_yellow", end = '')

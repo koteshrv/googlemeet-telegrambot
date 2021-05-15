@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!python
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from rich.console import Console
@@ -45,10 +45,6 @@ try:
 				noClasses = True
 
 		if not noClasses:
-			# reverting the classes if previously changed
-			# if the timetable is temporarily changed then its reverted to original 
-			revertTimeTable()
-
 			# todays class list from the present time
 			# for suppose if we have classes from 9:00 to 4:00 and if we run this script at 10:00 
 			# then it will consider classes from 10:00 into classList
@@ -153,6 +149,10 @@ try:
 
 					jsonData["log"]["classStatus"].update(periods)
 					sendDataToJSON('log.json', jsonData)
+
+				# reverting the classes if previously changed
+				# if the timetable is temporarily changed then its reverted to original 
+				revertTimeTable()
 
 				console.print("Attened all classes successfully!", style = "BLINK2 bold red")
 

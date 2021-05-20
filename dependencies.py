@@ -1,4 +1,4 @@
-from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, TimeoutException, WebDriverException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
@@ -8,8 +8,7 @@ from selenium import webdriver
 from datetime import datetime
 from rich.table import Table
 from art import *
-import openpyxl, calendar, requests, json, time, sys, os, re
-
+import openpyxl, calendar, requests, json, time, sys, os, re, discord, threading
 
 class color:
    PURPLE = '\033[95m'
@@ -27,15 +26,15 @@ class color:
 # fetch data from json and returns data
 # argument: file name of json
 def fetchDataFromJSON(fileName):
-	with open('C:\\googlemeetbot\\' + fileName) as file:
+	with open('/home/koteshrv/Desktop/googlemeetbot/' + fileName) as file:
 		data = json.load(file)
 	return data
 
 # export data to json
 # arguments: name of the file and data that we want to export
 def sendDataToJSON(fileName, data):
-	with open('C:\\googlemeetbot\\' + fileName, 'w') as file:
-		json.dump(data, file, indent = 4)		
+	with open('/home/koteshrv/Desktop/googlemeetbot/' + fileName, 'w') as file:
+		json.dump(data, file, indent = 4)	
 
 data = fetchDataFromJSON('data.json')
 profilePath = data['dir']['profilePath']
@@ -49,6 +48,7 @@ console = Console()
 
 # chrome options
 chromeOptions = Options()
+chromeOptions.page_load_strategy = 'eager'
 chromeOptions.add_argument("--disable-extensions")
 chromeOptions.add_argument("--disable-popup-blocking")
 chromeOptions.add_argument("--user-data-dir=" + profilePath)
@@ -206,8 +206,6 @@ def classStatus():
 	timings = list(todaysTimeTable.keys())
 	startTime = timings[0][:5]
 	endTime = timings[-1][8:]
-	time = datetime.now().time()
-	time = str(time).split(":")
 	if compareTime(int(startTime[:2]), int(startTime[3:]), int(endTime[:2]), int(endTime[3:]), True):
 		return -1
 	if compareTime(int(startTime[:2]), int(startTime[3:])):
@@ -259,8 +257,6 @@ def classesToday(printTable = False, printHoliday = True):
 		jsonData["todaysTimeTable"] = t
 		sendDataToJSON('log.json', jsonData)
 		if printTable:
-			currentTime = dateAndTime.time()
-			time = str(currentTime).split(":")
 			table = Table(show_lines=True)
 			table.add_column("Timings", justify = "center", style = "cyan", no_wrap = True)
 			table.add_column("Class", justify = "center", style = "green")
@@ -307,8 +303,6 @@ def whichClass(nextClass = False, nextClassTime = False, currentClassTime = Fals
 			return subjects[i]
 		if nextClassFlag and nextClassTime:
 			return (i, subjects[i])
-		time = datetime.now().time()
-		time = str(time).split(":")
 		if nextClass:
 			if compareTime(int(i[0:2]), int(i[3:5]), int(i[8:10]), int(i[11:]), True):
 				nextClassFlag = True
@@ -402,10 +396,20 @@ def updateTimeTable(day, period, classToUpdate = None, previousClass = False):
 		return prevClass
 	
 # prints log data
-def printLog():
+def printLog(discordServer = False):
 	logData = fetchDataFromJSON('log.json')
+	if discordServer:
+		return json.dumps(logData, indent = 4)
 	print(json.dumps(logData, indent = 4))
 
+def checkStatus(var):
+	logData = fetchDataFromJSON('log.json') 
+	return logData["log"][var]
+
+def setStatus(var, status = True):
+	logData = fetchDataFromJSON('log.json') 
+	logData["log"][str(var)] = status
+	sendDataToJSON('log.json', logData)
 
 # prints the arguments and their uses 
 def helpFunction():
@@ -449,18 +453,29 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 		log = {}
 		subject = subject.upper()
 		url = data['classroomLinks'][subject]
-		print('Opening ' + subject + ' classroom in new tab' )
+		print('Opening ' + subject + ' classroom in new tab')
+		discord('Opening ' + subject + ' classroom in new tab')
 		driver.get(url)
 		richStatus(sleepTime = 5)
 		print('Waiting for Google Meet link for ' + subject + ' class')
-		usedPrintInSameLine = False
+		discord('Waiting for Google Meet link for ' + subject + ' class')
 		linkPostedSeperatelyInAnnouncementTab = data['otherData']['linkPostedSeperatelyInAnnouncementTab']
 		# if subject link is posted seperately in announcement tab
 		if subject in linkPostedSeperatelyInAnnouncementTab:	
 			print(subject + ' class Link is posted in announcement tab')
 			print('So trying to fetch data from announcement tab')
+			discord(subject + ' class Link is posted in announcement tab')
+			discord('So trying to fetch data from announcement tab')
 			previousPostData = None
 			while True:
+				if checkStatus("stop"):
+					print('Abort called from discord server')
+					updateMembersCount(None)
+					discord('Force stopped the meet successfully')
+					driver.close()
+					setStatus("status", False)
+					setStatus("membersCount", None)
+					return
 				# from the below fetched data
 				# check the date is matching before joining
 				# if the link is posted today, then the element stores the time for eg: "12.06 AM"
@@ -470,6 +485,8 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 				if previousPostData != announcementTabData :
 					print('\n' + color.BOLD +'Fetched Data' + color.END + '\n')
 					print(color.BOLD + color.YELLOW + announcementTabData + color.END + '\n')
+					discord('__**Fetched Data**__')
+					discord('```' + announcementTabData + '```')
 				previousPostData = announcementTabData
 				# fetching url from annoucement tab data
 				# until url is fetched, the page loads for every 10 seconds
@@ -478,41 +495,78 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 					if (classURL[:24] == 'https://meet.google.com/') :
 						print('Fetched class link from the google classroom')
 						print('Opening ', classURL)
+						discord('Fetched class link from the google classroom')
+						discord('Opening ' +  classURL)
 						driver.get(classURL)
 						richStatus(sleepTime = 5)
 						break
 					else:
 						print('Fetching link failed or link not posted')
+						discord('Fetching link failed or link not posted')
 				else :
 					driver.refresh()
-					printInSameLine(str1 = 'Waiting for Todays link. Trying again in ', str2 = ' seconds', isChar = False, seconds = True)
-					usedPrintInSameLine = True
+					print('Waiting for Todays link. Trying again in 10 seconds')
+					discord('Waiting for Todays link. Trying again in 10 seconds')
+					for i in range(10):
+						time.sleep(1)
+						if checkStatus("stop"):
+							print('Abort called from discord server')
+							updateMembersCount(None)
+							discord('Force stopped the meet successfully')
+							driver.close()
+							setStatus("status", False)
+							setStatus("membersCount", None)
+							return
 		# fetches data from link posted in google classroom
 		# if link is not available and it loads and check for every 10 seconds
 		else :
 			while True:
 				try:
+					if checkStatus("stop"):
+						print('Command received from discord server! So stoping the bot now')
+						discord('Stoping the bot now')
+						setStatus("status", False)
+						return
 					classData = driver.find_element_by_class_name(meetLinkClass).text
 					classURL = re.search("(?P<url>https?://[^\s]+)", classData).group("url")
 					if classURL[:24] == 'https://meet.google.com/':
-						if usedPrintInSameLine == True:
-							printInSameLine(newLine = True)
 						print('Fetched class link from the google classroom')
 						print('Opening ', classURL)
+						discord('Fetched class link from the google classroom')
+						discord('Opening ' + classURL)
 						driver.get(classURL)
 						print('Opened meet link')
+						discord('Opened meet link')
 						richStatus(sleepTime = 5)
 						break
 				except AttributeError:
+					if checkStatus("stop"):
+						print('Abort called from discord server')
+						updateMembersCount(None)
+						discord('Force stopped the meet successfully')
+						driver.close()
+						setStatus("status", False)
+						setStatus("membersCount", None)
+						return
 					print('Meet link not available to fetch.')
+					discord('Meet link not available to fetch. Trying again in 10 seconds')
 					driver.refresh()
-					printInSameLine(str1 = 'Trying again in ', str2 = ' seconds', isChar = False, seconds = True)
-					usedPrintInSameLine = True
+					print('Trying again in 10 seconds')
+					for i in range(10):
+						time.sleep(1)
+						if checkStatus("stop"):
+							print('Abort called from discord server')
+							updateMembersCount(None)
+							discord('Force stopped the meet successfully')
+							driver.close()
+							setStatus("status", False)
+							setStatus("membersCount", None)
+							return
+
 	else:
 		if loginTime == None:
 			print('Opening ', URL)
 			driver.get(URL)
-			print('Opened meet link')
 			richStatus(sleepTime = 5)
 		else:
 			dateAndTime = datetime.now()
@@ -521,15 +575,32 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 			timeLeftForNextClass = subtractTime(loginTime, currentTime)
 			hours, minutes = timeLeftForNextClass.split(':')
 			sleepTimeForNextClass = int(hours) * 60 + int(minutes)
-			printInSameLine(str1 = 'Class is scheduled successfully. Will join the class in ', str2 = ' seconds', isChar = False, seconds = True, sleepTime = sleepTimeForNextClass, color = "bold red", minutes = True)
-			print(' ' * 100)
-			print('Opening ', URL)
-			driver.get(URL)
-			print('Opened meet link')
-			richStatus(sleepTime = 5)
+			
+			discord('Class is scheduled successfully. Will join the class in ' + hours + ' hr : ' + minutes + 'min')
+			print('Class is scheduled successfully. Will join the class in ' + hours + ' hr : ' + minutes + 'min')
+			timeleft = sleepTimeForNextClass * 60
+			while(timeleft > 0):
+				timeleft -= 10
+				time.sleep(10)
+				if checkStatus("stop"):
+					print('Abort called from discord server')
+					updateMembersCount(None)
+					discord('Force stopped the meet successfully')
+					driver.close()
+					setStatus("status", False)
+					setStatus("membersCount", None)
+					return
+			
+		print('Opening ', URL)
+		discord('Opening ' + URL)
+		driver.get(URL)
+		print('Opened meet link')
+		discord('Opened meet link')
+		richStatus(sleepTime = 5)
 
 
 	print('Pressing dismiss button')
+	discord('Pressing dismiss button')
 	warningDismiss = driver.find_element_by_xpath(warningDismissButton).click()
 	time.sleep(3)
 	# fetching count of members already joined
@@ -537,35 +608,64 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 	try :
 		membersCountBeforeJoiningData = driver.find_element_by_class_name(membersCountBeforeJoiningClass).text
 		print('\n' + color.BOLD + color.YELLOW + str(membersCountBeforeJoiningData) + color.END + '\n')
+		discord(str(membersCountBeforeJoiningData))
 		joinedMembers = membersAlreadyJoinedCount(membersCountBeforeJoiningData)
 		minCountToJoinConsidered = True
 		minCountToJoin = data['otherData']['minCountToJoin']
 	except NoSuchElementException:
 		#messageAboveJoinButtonData = driver.find_element_by_class_name(messageAboveJoinButtonClass).text
-		print("Members count not available! So joining the class without considering 'minCountToJoin'")
+		print("Members count not available! So joining the class without considering 'minCountToJoin")
+		discord("Members count not available! So joining the class without considering 'minCountToJoin'")
 		minCountToJoinConsidered = False
-	usedPrintInSameLine = False
 	# checking for minCountToJoin to join the class
 	while True:
+		if checkStatus("stop"):
+			print('Abort called from discord server')
+			updateMembersCount(None)
+			discord('Force stopped the meet successfully')
+			driver.close()
+			setStatus("status", False)
+			setStatus("membersCount", None)
+			return
 		if not minCountToJoinConsidered:
 			break
 		if joinedMembers >= minCountToJoin: 
-			if usedPrintInSameLine == True:
-				printInSameLine(newLine = True)
 			print('More than ' + str(minCountToJoin) + ' members already joined')
 			print('Joining the class now')
+			discord('More than ' + str(minCountToJoin) + ' members already joined')
+			discord('Joining the class now')
+			
 			break
 		else :
 			if joinedMembers == 0:
-				printInSameLine(str1 = 'No one joined. Trying again in ', str2 = ' seconds', isChar = False, seconds = True)
-				usedPrintInSameLine = True
+				print('No one joined. Will try for every 10 seconds')
+				discord('No one joined. Trying again in 10 seconds')
+				for i in range(10):
+					time.sleep(1)
+					if checkStatus("stop"):
+						print('Abort called from discord server')
+						updateMembersCount(None)
+						discord('Force stopped the meet successfully')
+						driver.close()
+						setStatus("status", False)
+						setStatus("membersCount", None)
+						return
 			else :
-				if usedPrintInSameLine == True:
-					printInSameLine(newLine = True)
 				print('Only ' + str(joinedMembers) + ' joined')
 				print('Waiting for ' + str(minCountToJoin - joinedMembers) + ' more students to join the class')
-				printInSameLine(str1 = 'Trying again in ', str2 = ' seconds', isChar = False, seconds = True)
-				usedPrintInSameLine = True
+				discord('Only ' + str(joinedMembers) + ' joined')
+				discord('Waiting for ' + str(minCountToJoin - joinedMembers) + ' more students to join the class')
+				discord('Trying again in 10 seconds')
+				for i in range(10):
+					time.sleep(1)
+					if checkStatus("stop"):
+						print('Abort called from discord server')
+						updateMembersCount(None)
+						discord('Force stopped the meet successfully')
+						driver.close()
+						setStatus("status", False)
+						setStatus("membersCount", None)
+						return
 				membersCountBeforeJoiningData = driver.find_element_by_class_name(membersCountBeforeJoiningClass).text
 				joinedMembers = membersAlreadyJoinedCount(membersCountBeforeJoiningData)
 	# waits until join button is clickable
@@ -576,6 +676,7 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 	element = wait.until(EC.element_to_be_clickable((By.XPATH, captionsButtonXPath)))
 	element.click()
 	print('Turning on captions')
+	discord('Turning on captions')
 	alertSound(frequency = False)
 	if URL == None:
 		# sending class joining time to discord
@@ -604,9 +705,22 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 	logData = fetchDataFromJSON('log.json')
 	# Reads the text from captions until str(count) > minCountToLeave:
 	while True:
+		if checkStatus("stop"):
+			print('Abort called from discord server')
+			updateMembersCount(None)
+			discord('Force stopped the meet successfully')
+			driver.close()
+			setStatus("status", False)
+			setStatus("membersCount", None)
+			return
 		wait.until(EC.visibility_of_element_located((By.XPATH, membersCountXPath)))
 		count = driver.find_element_by_xpath(membersCountXPath).text
-		printInSameLine('Members Count: ', count, sleepTime = 0, isChar = False)
+		updateMembersCount(count)
+		usedPrintInSameLine = False
+		if not checkStatus('discordServer'):
+			printInSameLine('Members Count: ', count, sleepTime = 0, isChar = False)
+			usedPrintInSameLine = True
+		
 		try:
 			# flag is used to check when class count reaches above minCountToLeave
 			# when it is set to true it implies that it is waiting to leave the class when count reaches below minCountToLeave
@@ -618,18 +732,21 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 			# if you want to enable auto replay when this triggers then uncomment the line below. This sends the response message that is given in data.json file
 			for word in alertWords:
 				if word in captionTextLower:
+					if usedPrintInSameLine:
+						printInSameLine(newLine = True)
 					discord("ALERT! Some one called you at " + str(datetime.now().time())[:8])
 					discord(captionTextLower)
 					discord("Triggered word: " + word)
 					print("Triggered word: " + word)
-					printInSameLine(newLine = True)
 					print(text2art("ALERT", font = "small")) 
 					alertSound() # alert sound for soundCount times
 					if autoReply:
 						responseMessage = data['otherData']['responseMessage']
 						sendMessageInChatBox(driver, responseMessage)	
 			# leaves the class when class count is less than minCountToLeave
-			if count < str(minCountToLeave) and flag :
+			if (count < str(minCountToLeave) and flag):
+				if usedPrintInSameLine:
+						printInSameLine(newLine = True)
 				alertSound(frequency = False)
 				if URL == None:
 					discord("Left the " + subject + " class at " + str(datetime.now().time())[:8])
@@ -639,14 +756,17 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 					logData["log"]["joiningLeavingTime"].update(log)
 					sendDataToJSON('log.json', logData)
 					driver.close()
+					updateMembersCount(None)
 					richStatus(sleepTime = 5, statusMessage = 'Left '+ subject + ' class', color = "bright_yellow")
 					console.print('\nLeft the class successfully', style = "bold red", end = '\r')	
-					break
 				else :
 					discord('Left the class of url ' + URL + ' successfully at ' + str(datetime.now().time())[:8])
 					driver.close()
+					updateMembersCount(None)
 					console.print('\nLeft the class successfully', style = "bold red")	
-					break
+				setStatus("status", False)
+				setStatus("membersCount", None)
+				break
 				
 					
 		except (NoSuchElementException, StaleElementReferenceException):
@@ -655,7 +775,9 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 			if count > str(minCountToLeave):
 				flag = True
 			# leaves the class when class count is less than minCountToLeave
-			if count < str(minCountToLeave) and flag :
+			if (count < str(minCountToLeave) and flag):
+				if usedPrintInSameLine:
+						printInSameLine(newLine = True)
 				alertSound(frequency = False)
 				if URL == None:
 					discord("Left the " + subject + " class at " + str(datetime.now().time())[:8])
@@ -665,14 +787,17 @@ def joinClass(driver, subject = None, URL = None, loginTime = None):
 					logData["log"]["joiningLeavingTime"].update(log)
 					sendDataToJSON('log.json', logData)
 					driver.close()
+					updateMembersCount(None)
 					richStatus(sleepTime = 5, statusMessage = 'Left '+ subject + ' class', color = "bright_yellow")
 					console.print('\nLeft the class successfully', style = "bold red", end = '\r')
-					break
 				else :
 					discord('Left the class of url ' + URL + ' successfully at ' + str(datetime.now().time())[:8])
 					driver.close()
+					updateMembersCount(None)
 					console.print('\nLeft the class successfully', style = "blink2 bold red")
-					break
+				setStatus("status", False)
+				setStatus("membersCount", None)
+				break
 				
 				
 
@@ -727,9 +852,11 @@ def loadDriver(classroom = False):
 	console.print('Turned off Camera', style = "bold red")
 	console.print('Turned off Microphone', style = "bold red")
 	print('Turned off Pop-up')
+	discord('Driver loaded successfully!')
 	if classroom:
 		driver.get('https://classroom.google.com')
 		print('Opening Google Classroom')
+		discord('Opening Google Classroom')
 		richStatus(sleepTime = 5)
 	return driver
 
@@ -774,3 +901,204 @@ def discord(message):
 		"content": message
 	}
 	requests.post(url, data = Message)
+
+def googlemeetbotThread():
+	setStatus("stop", False)
+	setStatus("status")
+	botThread = threading.Thread(target = googlemeetbotFunction)
+	botThread.start()
+
+def joinClassThread(classLink, schedule = None):
+	setStatus("stop", False)
+	setStatus("status")
+	driver = loadDriver()
+	if schedule == None:
+		joinClassThread = threading.Thread(target = joinClass, args=(driver, None, classLink, None, ))
+	else :
+		joinClassThread = threading.Thread(target = joinClass, args=(driver, None, classLink, schedule, ))
+	joinClassThread.start()
+
+
+def updateMembersCount(count):
+	logData = fetchDataFromJSON('log.json')
+	logData["log"]["membersCount"] = count
+	sendDataToJSON('log.json', logData)
+
+
+	
+def googlemeetbotFunction():
+	print(text2art("googlemeetbot", font = "small"))
+	# Checking for previous day log
+	# If previous day log is present then it's cleared
+	dateAndTime = datetime.now()
+	day = dateAndTime.day
+	weekDay = dateAndTime.today().strftime('%A')
+	jsonData = fetchDataFromJSON('log.json')
+	if jsonData["log"]["day"] != weekDay:
+		jsonData["log"]["day"] = weekDay
+		jsonData["log"]["joiningLeavingTime"] = {}
+		jsonData["log"]["classStatus"] = {}
+	sendDataToJSON('log.json', jsonData)
+
+	# checking for holiday
+	dateAndTime = datetime.now()
+	day = dateAndTime.day
+	updateholidaysList()
+	loadTimeTable()
+	jsonData = fetchDataFromJSON('log.json')
+	holidaysDict = jsonData["holidaysList"]
+	classesTodayData = jsonData["todaysTimeTable"]
+	for holidayDate in holidaysDict:
+		if str(day) == holidayDate:
+			console.print('No classes today due to '+ holidaysDict[holidayDate], style = "bold red")
+			console.print('[bold][green]' + 'Done\n')
+			return
+
+	# todays class list from the present time
+	# for suppose if we have classes from 9:00 to 4:00 and if we run this script at 10:00 
+	# then it will consider classes from 10:00 into classList
+	classesList = []
+	flag = False
+	for timings in classesTodayData:
+		# if current time is less than class start time then we should add all periods to the list
+		if compareTime(int(timings[0:2]), int(timings[3:5])): 
+			flag = True
+		# if we have a class in current time then we should add classes from now to the list
+		if compareTime(int(timings[0:2]), int(timings[3:5]), int(timings[8:10]), int(timings[11:]), True):
+			flag = True
+		if flag:
+			classesList.append(timings + ' '+ classesTodayData[timings])
+
+	completedClassesCount = len(classesTodayData) - len(classesList)
+
+	classesToday(printTable = True, printHoliday = False)
+
+	# get status for class joining
+	# if status is True: classwork is completed
+	# if status is false: classwork is scheduled for today
+	# if status if -1: classwork is going on at the moment
+	status = classStatus()
+
+	# if status is true: classwork is completed for today
+	if status == True:
+		console.print('All classes attended for today', style = "blink2 bold red")
+		discord('All classes attended for today')
+		return
+
+	# if status will be false when current time is less than start time of college so we wait here until status becomes -1	
+	if status == False:
+		
+		jsonData = fetchDataFromJSON('log.json')
+		todaysTimeTable = jsonData["todaysTimeTable"]
+		timings = list(todaysTimeTable.keys())
+		startTime = timings[0][:5]
+		dateAndTime = datetime.now()
+		currentTime = dateAndTime.time()
+		currentTime = str(currentTime)[:5]
+		timeForClass = subtractTime(startTime, currentTime)
+		l = timeForClass.split(':')
+		timeToSleep = ((int(l[0]) * 60) + int(l[1]))
+		print('You are early for the class. So I am sleeping for the next ' + str(timeToSleep) + ' minutes')
+		discord('You are early for the class. So I am sleeping for the next ' + str(timeToSleep) + ' minutes')
+		classNow = whichClass()
+		while(classNow == None):
+			time.sleep(1)
+			classNow = whichClass()
+			if checkStatus("stop"):
+				print('Command received from discord server! So stoping the bot now')
+				discord('Killed the bot successfully')
+				setStatus("status", False)
+				setStatus("membersCount", None)
+				return
+
+	# if today is not a holiday and status is -1 that is classwork is going on 
+	if status == -1:
+		classNow = whichClass()
+		totalclassesTodayData = len(classesList)
+		usedPrintInSameLine = False
+
+		# joins all classes that are stored in classesList
+		for i in range(totalclassesTodayData):
+			classNow = whichClass()
+
+			# if current class returns "Lunch" then it sleeps until next class
+			if classNow == "Lunch":
+				nextClass = whichClass(nextClass = True, nextClassTime = True)
+				nextClassStartTime = nextClass[0][:5]
+				dateAndTime = datetime.now()
+				currentTime = dateAndTime.time()
+				currentTime = str(currentTime)[:5]
+				timeLeftForNextClass = subtractTime(nextClassStartTime, currentTime)
+				hours, minutes = timeLeftForNextClass.split(':')
+				print('Lunch Time. Will join next class in ' + hours + ' hr : ' + minutes + ' min')
+				discord('Lunch Time. Will join next class in ' + hours + ' hr : ' + minutes + ' min')
+				classNow = whichClass()
+				while(classNow == 'Lunch'):
+					time.sleep(1)
+					classNow = whichClass()
+					if checkStatus("stop"):
+						print('Command received from discord server! So stoping the bot now')
+						discord('Stopping the bot now')
+						return
+
+			# if current class is "None" then it will wait until next class
+			# current class returns "None" when we dont have any period or if we already attended the class
+			if classNow == None:
+				
+				nextClass = whichClass(nextClass = True, nextClassTime = True)
+				nextClassStartTime = nextClass[0][:5]
+				dateAndTime = datetime.now()
+				currentTime = dateAndTime.time()
+				currentTime = str(currentTime)[:5]
+				timeLeftForNextClass = subtractTime(nextClassStartTime, currentTime)
+				hours, minutes = timeLeftForNextClass.split(':')
+				sleepTimeForNextClass = int(hours) * 60 + int(minutes)
+				print('No class at the moment. Will try again in ' + hours + ' hr : ' + minutes + ' min')
+				discord('No class at the moment. Will try again in ' + hours + ' hr : ' + minutes + ' min')
+				classNow = whichClass()
+				while(classNow == None):
+					time.sleep(1)
+					if checkStatus("stop"):
+						print('Command received from discord server! So stoping the bot now')
+						setStatus("status", False)
+						setStatus("membersCount", None)
+						return
+
+
+			# joins current class and updates the log	
+			while classNow == None:
+				classNow = whichClass()
+				if checkStatus("stop"):
+					print('Command received from discord server! So stoping the bot now')
+					setStatus("status", False)
+					setStatus("membersCount", None)
+					return
+			console.print('\n' + classNow, style = "bold bright_yellow", end = '')
+			console.print(' class is going on at the moment\n', style = "bold")
+			driver = loadDriver()
+			print('Trying to join ' + classNow + ' class')
+			joinClass(driver, subject = classNow)
+			if checkStatus("stop"):
+				print('Abort called from discord server')
+				updateMembersCount(None)
+				discord('Force stopped the meet successfully')
+				setStatus("status", False)
+				setStatus("membersCount", None)
+				return
+			jsonData = fetchDataFromJSON('log.json')
+			t = jsonData["todaysTimeTable"]
+			classTime = list(t.keys())
+			periods = {}
+			if classTime[i + completedClassesCount] in periods:
+				periods[classTime[i + completedClassesCount]].update(classNow)
+			else :
+				periods[classTime[i + completedClassesCount]] = classNow
+
+			jsonData["log"]["classStatus"].update(periods)
+			sendDataToJSON('log.json', jsonData)
+
+		# reverting the classes if previously changed
+		# if the timetable is temporarily changed then its reverted to original 
+		revertTimeTable()
+
+		console.print("Attened all classes successfully!", style = "BLINK2 bold red")

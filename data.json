@@ -13,23 +13,26 @@
     "credentials": {
         "mailAddress": "",
         "password": "",
-        "discordURL": ""
+        "discordURL": "",
+        "token" : ""
     },
     "dir": {
         "pathToChromeDriver": "/home/koteshrv/.local/bin/chromedriver",
         "profilePath": "/home/koteshrv/.config/google-chrome/Profile 1",
-        "classTimeTableLocation": "/home/koteshrv/.local/bin/timetable.xlsx"
+        "classTimeTableLocation": "/home/koteshrv/Desktop/googlemeetbot/timetable.xlsx"
     },
     "otherData": {
         "alertWords": [
             "respond",
             "respond.",
             "Attendance.",
-            "Attendance"
+            "Attendance",
+            "454",
+            "454."
         ],
         "windowsUser" : 0,
-        "minCountToJoin": 20,
-        "minCountToLeave": 35,
+        "minCountToJoin": 0,
+        "minCountToLeave": 1,
         "soundFrequency": 40,
         "autoReply" : 0,
         "responseMessage": "present sir",

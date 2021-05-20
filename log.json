@@ -1,7 +1,5 @@
 {
-    "holidaysList": {
-        "14": "Ramzan"
-    },
+    "holidaysList": {},
     "completeTimeTable": {
         "Timings": [
             "09:00 - 10:00",
@@ -61,16 +59,25 @@
         ]
     },
     "todaysTimeTable": {
-        "09:00 - 10:00": "MWE",
-        "10:00 - 11:00": "MPMC",
-        "11:00 - 12:00": "DC",
+        "09:00 - 10:00": "MPMC",
+        "10:00 - 11:00": "CN",
+        "11:00 - 12:00": "Java",
         "12:00 - 13:00": "Lunch",
-        "13:00 - 15:00": "OOPSLAB"
+        "13:00 - 15:00": "PDSS",
+        "15:00 - 17:00": "R&A"
     },
     "log": {
-        "day": "Friday",
-        "joiningLeavingTime": {},
-        "classStatus": {}
+        "day": "Thursday",
+        "joiningLeavingTime": {
+            "09:00 - 10:00": {
+                "joining time": "09:47:39.046229"
+            }
+        },
+        "classStatus": {},
+        "membersCount": null,
+        "status": false,
+        "stop": true,
+        "discordServer": true
     },
     "tempTimetableUpdate": {}
 }

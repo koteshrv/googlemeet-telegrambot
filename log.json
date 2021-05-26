@@ -1,7 +1,5 @@
 {
-    "holidaysList": {
-        "14": "Ramzan"
-    },
+    "holidaysList": {},
     "completeTimeTable": {
         "Timings": [
             "09:00 - 10:00",
@@ -13,7 +11,7 @@
             "15:00 - 17:00"
         ],
         "Monday": [
-            "DC",
+            "MPMC",
             "CN",
             "Java",
             "Lunch",
@@ -26,7 +24,7 @@
             "MWE",
             "Lunch",
             "CN",
-            "DC",
+            "CN",
             "R&A"
         ],
         "Wednesday": [
@@ -61,16 +59,40 @@
         ]
     },
     "todaysTimeTable": {
-        "09:00 - 10:00": "MWE",
+        "09:00 - 10:00": "VLSI",
         "10:00 - 11:00": "MPMC",
-        "11:00 - 12:00": "DC",
+        "11:00 - 12:00": "MWE",
         "12:00 - 13:00": "Lunch",
-        "13:00 - 15:00": "OOPSLAB"
+        "13:00 - 15:00": "CN",
+        "15:00 - 17:00": "R&A"
     },
     "log": {
-        "day": "Friday",
+        "day": "Tuesday",
         "joiningLeavingTime": {},
-        "classStatus": {}
+        "classStatus": {},
+        "membersCount": "60",
+        "status": true,
+        "stop": false,
+        "discordServer": false,
+        "loadDriver": true,
+        "abort": false,
+        "config": false,
+        "sendMessageRequest": false,
+        "messageSentFromDiscordToMeet": false,
+        "messageToSendFromDiscordToMeet": "testing from discord"
     },
-    "tempTimetableUpdate": {}
+    "tempTimetableUpdate": {
+        "0": {
+            "day": "monday",
+            "period": "1",
+            "classToUpdate": "MPMC",
+            "previousClass": "DC"
+        },
+        "1": {
+            "day": "tuesday",
+            "period": "6",
+            "classToUpdate": "CN",
+            "previousClass": "DC"
+        }
+    }
 }

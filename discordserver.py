@@ -2,6 +2,7 @@ from dependencies import *
 import discord, asyncio, traceback
 
 open(config.PATH + 'discordserverlog.txt', 'w').close()
+
 client = discord.Client()
 data = fetchDataFromJSON('data.json')
 token = data["credentials"]["token"]

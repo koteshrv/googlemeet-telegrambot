@@ -126,6 +126,8 @@ try:
 
 except KeyboardInterrupt:
 	print('\nInterrupted')
+	print(' ' * 150)
+	print('Interrupted')
 	try:
 		sys.exit(0)
 	except SystemExit:

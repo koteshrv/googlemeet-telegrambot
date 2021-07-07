@@ -13,7 +13,7 @@
     },
     "dir": {
         "profilePath": "~/.config/google-chrome",
-        "classTimeTableLocation": "/home/koteshrv/Desktop/googlemeetbot/timetable.xlsx"
+        "classTimeTableLocation": "/app/timetable.xlsx"
     },
     "otherData": {
         "alertWords": [],

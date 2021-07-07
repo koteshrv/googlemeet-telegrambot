@@ -1,5 +1,7 @@
 {
-    "holidaysList": {},
+    "holidaysList": {
+        "10": "Second Saturday"
+    },
     "completeTimeTable": {
         "Timings": [
             "09:00 - 10:00",
@@ -8,7 +10,7 @@
             "12:00 - 13:00",
             "13:00 - 14:00",
             "14:00 - 15:00",
-            "15:00 - 17:00"
+            "15:00 - 23:00"
         ],
         "Monday": [
             "MPMC",
@@ -31,9 +33,10 @@
             "CN",
             "Java",
             "MPMC",
-            "Lunch",
-            "VLSI",
-            "DC"
+            "TEST",
+            "TEST",
+            "TEST",
+            "TEST"
         ],
         "Thursday": [
             "MPMC",
@@ -59,21 +62,23 @@
         ]
     },
     "todaysTimeTable": {
-        "09:00 - 10:00": "VLSI",
-        "10:00 - 11:00": "MPMC",
-        "11:00 - 12:00": "MWE",
-        "12:00 - 13:00": "Lunch",
-        "13:00 - 15:00": "CN",
-        "15:00 - 17:00": "R&A"
+        "09:00 - 10:00": "CN",
+        "10:00 - 11:00": "Java",
+        "11:00 - 12:00": "MPMC",
+        "12:00 - 23:00": "TEST"
     },
     "log": {
-        "day": "Tuesday",
-        "joiningLeavingTime": {},
+        "day": "Wednesday",
+        "joiningLeavingTime": {
+            "12:00 - 23:00": {
+                "joining time": "22:28:35.530655"
+            }
+        },
         "classStatus": {},
-        "membersCount": "60",
+        "membersCount": "2",
         "status": true,
-        "stop": false,
-        "discordServer": false,
+        "stop": true,
+        "discordServer": true,
         "loadDriver": true,
         "abort": false,
         "config": false,
@@ -81,18 +86,5 @@
         "messageSentFromDiscordToMeet": false,
         "messageToSendFromDiscordToMeet": "testing from discord"
     },
-    "tempTimetableUpdate": {
-        "0": {
-            "day": "monday",
-            "period": "1",
-            "classToUpdate": "MPMC",
-            "previousClass": "DC"
-        },
-        "1": {
-            "day": "tuesday",
-            "period": "6",
-            "classToUpdate": "CN",
-            "previousClass": "DC"
-        }
-    }
+    "tempTimetableUpdate": {}
 }

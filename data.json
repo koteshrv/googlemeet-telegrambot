@@ -9,70 +9,24 @@
         "OOPSLAB": "https://classroom.google.com/c/MzEyMjg2NzQ5Nzc1",
         "PDSS": "https://classroom.google.com/c/MzEzMDA0MzMzODQz",
         "R&A": "https://classroom.google.com/c/MTI2NTM4NzY2NjMx",
-        "TEST" : "https://classroom.google.com/c/MzM1OTAwMDE3Mzc2",
-        "TEST2" : "https://classroom.google.com/c/MzM5MTA2NDUzNTQz"
-    },
-    "credentials": {
-        "mailAddress": "",
-        "password": "",
-        "discordURL": "",
-        "token" : ""
+        "TEST" : "https://classroom.google.com/c/MzA1NTIwMjU1NzQ3"
     },
     "dir": {
-        "pathToChromeDriver": "C:\\googlemeetbot\\chromedriver.exe",
-        "profilePath": "C:\\Users\\kotir\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 1",
-        "classTimeTableLocation": "C:\\googlemeetbot\\timetable.xlsx"
+        "pathToChromeDriver": "/home/koteshrv/.local/bin/chromedriver",
+        "profilePath": "/home/koteshrv/.config/google-chrome/Profile 1",
+        "classTimeTableLocation": "/home/koteshrv/Desktop/googlemeetbot/timetable.xlsx"
     },
     "otherData": {
-        "alertWords": [
-            "roll call",
-            "attendance",
-            "respond",
-            "454",
-            "54",
-            "Koteswararao",
-            "45",
-            "46",
-            "47",
-            "48",
-            "49",
-            "50",
-            "51",
-            "52",
-            "53",
-            "54",
-            "55",
-            "56",
-            "57",
-            "58",
-            "59",
-            "60",
-            "445",
-            "446",
-            "447",
-            "448",
-            "449",
-            "450",
-            "451",
-            "452",
-            "453",
-            "454",
-            "455",
-            "456",
-            "457",
-            "458",
-            "459",
-            "460"
-        ],
-        "minCountToJoin": 25,
-        "minCountToLeave": 35,
-        "soundFrequency": 15,
+        "alertWords": [],
+        "minCountToJoin": 0,
+        "minCountToLeave": 1,
         "autoReply" : 0,
         "leaveAtTime" : 0,
         "responseMessage": "present sir",
         "linkPostedSeperatelyInAnnouncementTab": [
             "R&A",
-            "CN"
+            "CN",
+            "MPMCLAB"
         ]
     }
 }

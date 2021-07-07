@@ -8,7 +8,9 @@ from selenium import webdriver
 from datetime import datetime, timedelta
 from rich.table import Table
 from art import *
-import openpyxl, calendar, requests, json, time, re, discord, threading, config, winsound, sys, os, string, psutil
+from os import environ
+import openpyxl, calendar, requests, json, time, re, discord, threading, sys, string, os, config
+
 class color:
    PURPLE = '\033[95m'
    CYAN = '\033[96m'
@@ -53,7 +55,7 @@ chromeOptions.add_argument("--disable-extensions")
 chromeOptions.add_argument("--disable-popup-blocking")
 chromeOptions.add_argument("--user-data-dir=" + profilePath)
 chromeOptions.add_experimental_option("prefs", { \
-"profile.default_content_setting_values.media_stream_mic": 2,
+"profile.default_content_setting_values.media_stream_mic": 2, # 1:allow, 2:block
 "profile.default_content_setting_values.media_stream_camera": 2,
 "profile.default_content_setting_values.geolocation": 2,
 "profile.default_content_setting_values.notifications": 2
@@ -61,9 +63,9 @@ chromeOptions.add_experimental_option("prefs", { \
 
 # classes and xpaths of google meet and google classroom elements
 mailBoxXPath = '//*[@id="identifierId"]'
-nextButtonXPath = '//*[@id="identifierNext"]/div/button'
+nextButtonXPath = '//*[@id="identifierNext"]'
 enterPasswordBoxXPath = '//*[@id="password"]/div[1]/div/div[1]/input'
-passwordNextButtonXPath = '//*[@id="passwordNext"]/div/button/div[2]'
+passwordNextButtonXPath = '//*[@id="passwordNext"]'
 meetLinkXPath = '//*[@id="yDmH0d"]/div[4]/div[3]/div/div[1]/div/div[2]/div[2]/div/span/a'
 meetLinkInCommentsXPath = '//*[@id="ow43"]/div[2]/div/div[1]/div[2]/div[1]/html-blob/span/a[1]'
 dateTimeInCommentsXPath = '//*[@id="ow43"]/div[2]/div[1]/div[1]/div[1]/div[1]/span/span[1]'
@@ -72,14 +74,10 @@ meetLinkClass = 'qyN25'
 warningDismissButton = '//*[@id="yDmH0d"]/div[3]/div/div[2]/div[3]/div/span/span'
 membersCountBeforeJoiningClass = 'Yi3Cfd'
 messageAboveJoinButtonClass = 'JMAjle'
-joinButtonXPath = '//*[@id="yDmH0d"]/c-wiz/div/div/div[9]/div[3]/div/div/div[2]/div/div[1]/div[2]/div/div[2]/div/div[1]/div[1]/span/span'
-captionsButtonXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[9]/div[3]/div[2]/div/span/span/div/div[1]/i'
-captionsXPath = 'VbkSUe'
-membersCountXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[1]/div[3]/div/div[2]/div[1]/span/span/div/div/span[2]'
-chatBoxButtonXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[1]/div[3]/div/div[2]/div[3]/span/span'
-chatBoxXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div/div[2]/div[2]/div[2]/span[2]/div/div[4]/div[1]/div[1]/div[2]/textarea'
-chatSendButtonXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div/div[2]/div[2]/div[2]/span[2]/div/div[4]/div[2]/span/span'
-chatBoxCloseXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div/div[2]/div[1]/div[2]/div/span/button/i'	
+joinButtonXPath = '//*[@id="yDmH0d"]/c-wiz/div/div/div[9]/div[3]/div/div/div[4]/div/div/div[2]/div/div[2]/div/div[1]/div[1]/span'
+captionsButtonXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[10]/div[2]/div/div[3]/div/span/button/span[2]'
+captions = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[7]/div/div[2]/div'
+membersCountXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[10]/div[3]/div[2]/div/div/div[2]/div/div'
 
 def checkStatus(var):
 	logData = fetchDataFromJSON('log.json') 
@@ -92,7 +90,7 @@ def setStatus(var, status = True):
 
 # sends message to discord
 def discord(message):
-	url = data['credentials']['discordURL']
+	url = environ('DISCORD_WEBHOOK')
 	Message = {
 		"content": message
 	}
@@ -441,7 +439,7 @@ def joinClass(subject = None, URL = None, loginTime = None):
 	# used when we want to implicitly wait 
 	# time = 90/60 = 1.5 minutes
 	loadDriver()
-	wait = WebDriverWait(config.driver, 300)
+	wait = WebDriverWait(driver, 90)
 	if URL == None:
 		log = {}
 		subject = subject.upper()
@@ -449,12 +447,12 @@ def joinClass(subject = None, URL = None, loginTime = None):
 		discordAndPrint('Opening ' + subject + ' classroom in new tab')
 		while True:
 			try:
-				config.driver.get(url)
+				driver.get(url)
 				break
 			except Exception:
 				discordAndPrint('Timeout exception occured! So closing current driver and trying again')
-				config.driver.close()
-				config.driver.quit()
+				driver.close()
+				driver.quit()
 				loadDriver()
 		loadingAnimation()
 		discordAndPrint('Waiting for Google Meet link for ' + subject + ' class')
@@ -473,8 +471,8 @@ def joinClass(subject = None, URL = None, loginTime = None):
 				# if the link is not posted today, then element stores the day for eg: "May 11"
 				while True:
 					try:
-						announcementTabData = str(config.driver.find_element_by_class_name(classroomPostClass).text)
-						announcementTabpostedDateTime = str(config.driver.find_element_by_xpath(dateTimeInCommentsXPath).text)
+						announcementTabData = str(driver.find_element_by_class_name(classroomPostClass).text)
+						announcementTabpostedDateTime = str(driver.find_element_by_xpath(dateTimeInCommentsXPath).text)
 						break
 					except Exception:
 						discordAndPrint('Exception occured when trying to fetch data. So trying again in 30 seconds')
@@ -497,19 +495,19 @@ def joinClass(subject = None, URL = None, loginTime = None):
 						discordAndPrint('Opening ' + classURL)
 						while True:
 							try:
-								config.driver.get(classURL)
+								driver.get(classURL)
 								break
 							except Exception:
 								discordAndPrint('Timeout exception occured! So closing current driver and trying again')
-								config.driver.close()
-								config.driver.quit()
+								driver.close()
+								driver.quit()
 								loadDriver()
 						loadingAnimation()
 						break
 					else:
 						discordAndPrint('Fetching link failed or link not posted')
 				else :
-					config.driver.refresh()
+					driver.refresh()
 					discordAndPrint('Waiting for Todays link. Trying again in 10 seconds')
 					for i in range(10):
 						time.sleep(1)
@@ -522,19 +520,19 @@ def joinClass(subject = None, URL = None, loginTime = None):
 				try:
 					if abortBotIfTriggered():
 						return
-					classData = config.driver.find_element_by_class_name(meetLinkClass).text
+					classData = driver.find_element_by_class_name(meetLinkClass).text
 					classURL = re.search("(?P<url>https?://[^\s]+)", classData).group("url")
 					if classURL[:24] == 'https://meet.google.com/':
 						discordAndPrint('Fetched class link from the google classroom')
 						discordAndPrint('Opening ' + classURL)
 						while True:
 							try:
-								config.driver.get(classURL)
+								driver.get(classURL)
 								break
 							except Exception:
 								discordAndPrint('Timeout exception occured! So closing current driver and trying again')
-								config.driver.close()
-								config.driver.quit()
+								driver.close()
+								driver.quit()
 								loadDriver()
 						discordAndPrint('Opened meet link')
 						loadingAnimation()
@@ -543,7 +541,7 @@ def joinClass(subject = None, URL = None, loginTime = None):
 					if abortBotIfTriggered():
 						return
 					discordAndPrint('Meet link not available to fetch. Trying again in 10 seconds')
-					config.driver.refresh()
+					driver.refresh()
 					for i in range(10):
 						time.sleep(1)
 						if abortBotIfTriggered():
@@ -554,12 +552,12 @@ def joinClass(subject = None, URL = None, loginTime = None):
 			print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + 'Opening ', URL)
 			while True:
 				try:
-					config.driver.get(URL)
+					driver.get(URL)
 					break
 				except Exception:
 					discordAndPrint('Timeout exception occured! So closing current driver and trying again')
-					config.driver.close()
-					config.driver.quit()
+					driver.close()
+					driver.quit()
 					loadDriver()
 			loadingAnimation()
 		else:
@@ -575,31 +573,31 @@ def joinClass(subject = None, URL = None, loginTime = None):
 		discordAndPrint('Opening ' + URL)
 		while True:
 			try:
-				config.driver.get(URL)
+				driver.get(URL)
 				break
 			except Exception:
 				discordAndPrint('Timeout exception occured! So closing current driver and trying again')
-				config.driver.close()
-				config.driver.quit()
+				driver.close()
+				driver.quit()
 				loadDriver()
 		discordAndPrint('Opened meet link')
 		loadingAnimation()
 
 
 	discordAndPrint('Pressing dismiss button')
-	warningDismiss = config.driver.find_element_by_xpath(warningDismissButton).click()
+	warningDismiss = driver.find_element_by_xpath(warningDismissButton).click()
 	time.sleep(3)
 	# fetching count of members already joined
 	# if members count is not available then is sets the  minCountToJoinConsidered to False
 	try :
-		membersCountBeforeJoiningData = config.driver.find_element_by_class_name(membersCountBeforeJoiningClass).text
+		membersCountBeforeJoiningData = driver.find_element_by_class_name(membersCountBeforeJoiningClass).text
 		print('\n' + '[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + color.BOLD + color.YELLOW + str(membersCountBeforeJoiningData) + color.END + '\n')
 		discord(str(membersCountBeforeJoiningData))
 		joinedMembers = membersAlreadyJoinedCount(membersCountBeforeJoiningData)
 		minCountToJoinConsidered = True
 		minCountToJoin = data['otherData']['minCountToJoin']
 	except NoSuchElementException:
-		#messageAboveJoinButtonData = config.driver.find_element_by_class_name(messageAboveJoinButtonClass).text
+		#messageAboveJoinButtonData = driver.find_element_by_class_name(messageAboveJoinButtonClass).text
 		discordAndPrint("Members count not available! So joining the class without considering 'minCountToJoin'")
 		minCountToJoinConsidered = False
 	# checking for minCountToJoin to join the class
@@ -627,7 +625,7 @@ def joinClass(subject = None, URL = None, loginTime = None):
 					time.sleep(1)
 					if abortBotIfTriggered():
 						return
-				membersCountBeforeJoiningData = config.driver.find_element_by_class_name(membersCountBeforeJoiningClass).text
+				membersCountBeforeJoiningData = driver.find_element_by_class_name(membersCountBeforeJoiningClass).text
 				joinedMembers = membersAlreadyJoinedCount(membersCountBeforeJoiningData)
 	# waits until join button is clickable
 	element = wait.until(EC.element_to_be_clickable((By.XPATH, joinButtonXPath)))
@@ -657,7 +655,7 @@ def joinClass(subject = None, URL = None, loginTime = None):
 		# sending class joining time to discord
 		discord('Joined the class with ' + URL + ' successfully at ' + str(datetime.now().time())[:8])
 	# counting number of students joined 
-	count = config.driver.find_element_by_xpath(membersCountXPath).text
+	count = driver.find_element_by_xpath(membersCountXPath).text
 	flag = False
 	minCountToLeave = data['otherData']['minCountToLeave']
 	alertWords = data['otherData']['alertWords']
@@ -667,11 +665,10 @@ def joinClass(subject = None, URL = None, loginTime = None):
 	while True:
 		messageFromDiscord = fetchDataFromJSON('log.json')
 		messageFromDiscord = messageFromDiscord["log"]["messageToSendFromDiscordToMeet"]
-		sendMessageInChatBox(messageFromDiscord, True)
 		if abortBotIfTriggered():
 			return
 		try:
-			count = config.driver.find_element_by_xpath(membersCountXPath).text
+			count = driver.find_element_by_xpath(membersCountXPath).text
 			updateMembersCount(count)
 		finally:
 			pass
@@ -685,7 +682,7 @@ def joinClass(subject = None, URL = None, loginTime = None):
 			# when it is set to true it implies that it is waiting to leave the class when count reaches below minCountToLeave
 			if count > str(minCountToLeave):
 				flag = True
-			elems = config.driver.find_element_by_class_name(captionsXPath)
+			elems = driver.find_element_by_xpath(captions)
 			captionTextLower = str(elems.text).translate(str.maketrans('', '', string.punctuation)).lower()
 			# if alert word is found in captions then it plays an alert sound for soundFrequency times and then sends alert message to discord
 			# if you want to enable auto replay when this triggers then uncomment the line below. This sends the response message that is given in data.json file
@@ -701,10 +698,7 @@ def joinClass(subject = None, URL = None, loginTime = None):
 					for i in range(10):
 						if abortBotIfTriggered():
 							return 
-						time.sleep(1)
-					if autoReply:
-						responseMessage = data['otherData']['responseMessage']
-						sendMessageInChatBox(responseMessage)	
+						time.sleep(1)	
 
 			# leaves the class when class count is less than minCountToLeave
 			if (count < str(minCountToLeave) and flag) or data["otherData"]["leaveAtTime"]:
@@ -720,13 +714,13 @@ def joinClass(subject = None, URL = None, loginTime = None):
 					logData = fetchDataFromJSON('log.json')
 					logData["log"]["joiningLeavingTime"].update(log)
 					sendDataToJSON('log.json', logData)
-					config.driver.close()
+					driver.close()
 					updateMembersCount(None)
 					loadingAnimation('Left '+ subject + ' class')
 					console.print('\n' + '[' + str(datetime.now().strftime("%H:%M:%S")) + ']  Left the class successfully', style = "bold red", end = '\r')	
 				else :
 					discord('Left the class of url ' + URL + ' successfully at ' + str(datetime.now().time())[:8])
-					config.driver.close()
+					driver.close()
 					updateMembersCount(None)
 					console.print('\n'+ '[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' +'Left the class successfully', style = "bold red")	
 				setStatus("status", False)
@@ -753,44 +747,19 @@ def joinClass(subject = None, URL = None, loginTime = None):
 					logData = fetchDataFromJSON('log.json')
 					logData["log"]["joiningLeavingTime"].update(log)
 					sendDataToJSON('log.json', logData)
-					config.driver.close()
+					driver.close()
 					updateMembersCount(None)
 					loadingAnimation('Left '+ subject + ' class')
 					console.print('\n' + '[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + 'Left the class successfully', style = "bold red", end = '\r')	
 				else :
 					discord('Left the class of url ' + URL + ' successfully at ' + str(datetime.now().time())[:8])
-					config.driver.close()
+					driver.close()
 					updateMembersCount(None)
 					console.print('\n' + '[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + 'Left the class successfully', style = "bold red")	
 				setStatus("status", False)
 				setStatus("membersCount", None)
 				break				
 
-# sends the message in chat box when alert word is triggered in captions
-def sendMessageInChatBox(message, fromDiscord = False):
-	if fromDiscord:
-		if not checkStatus("sendMessageRequest"):
-			return
-
-	config.driver.find_element_by_xpath(chatBoxButtonXPath).click()
-	config.driver.implicitly_wait(10)
-	time.sleep(1)
-	chatBox = config.driver.find_element_by_xpath(chatBoxXPath)
-	chatBox.send_keys(message)
-	time.sleep(1)
-	config.driver.find_element_by_xpath(chatSendButtonXPath).click()
-	config.driver.implicitly_wait(10)
-	time.sleep(1)
-	config.driver.find_element_by_xpath(chatBoxCloseXPath).click()
-	config.driver.implicitly_wait(10)
-	print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + 'Responded to the class by sending ', color.BOLD + message + color.END)
-	discord('Responded to the class by sending ' +  message)
-	if fromDiscord:
-		setStatus("messageSentFromDiscordToMeet")
-	for i in range(10):
-		if abortBotIfTriggered():
-			return
-		time.sleep(1) 
 	
 # checks for abort call from discord server
 def abortBotIfTriggered():
@@ -802,7 +771,7 @@ def abortBotIfTriggered():
 		updateMembersCount(None)
 		discord('Force stopped the meet successfully')
 		try:
-			config.driver.quit()
+			driver.quit()
 		except Exception:
 			pass
 		setStatus("status", False)
@@ -816,16 +785,17 @@ def alertSound(frequency = True):
 	if frequency:
 		soundFrequency = data['otherData']['soundFrequency']
 		for i in range(soundFrequency):
-			winsound.Beep(500, 1000)
+			#winsound.Beep(500, 1000)
 			time.sleep(1)	
 	else:
-		winsound.Beep(500, 1000)
+		#winsound.Beep(500, 1000)
+		pass
 
 # launches the chrome driver 
 def loadDriver():
+	global driver
 	pathToChromeDriver = data['dir']['pathToChromeDriver']
 	driver = webdriver.Chrome(options = chromeOptions, executable_path = pathToChromeDriver)
-	config.driver = driver
 	driver.maximize_window()
 	driver.set_page_load_timeout(10)
 	discordAndPrint('Driver loaded successfully!')
@@ -837,29 +807,29 @@ def login():
 	discordAndPrint('Logging into ' + color.BOLD + 'Google account' + color.END)
 	while True:
 		try:
-			config.driver.get('https://classroom.google.com/?emr=0')
+			driver.get('https://classroom.google.com/?emr=0')
 			break
 		except Exception:
 			discordAndPrint('Timeout exception occured! So closing current driver and trying again')
-			config.driver.close()
-			config.driver.quit()
+			driver.close()
+			driver.quit()
 			loadDriver()
 	time.sleep(3)
 	mailAddress = data['credentials']['mailAddress']
 	password = data['credentials']['password']
 	print('Entering mail address')
-	mailBox = config.driver.find_element_by_xpath(mailBoxXPath)
-	config.driver.implicitly_wait(10)
+	mailBox = driver.find_element_by_xpath(mailBoxXPath)
+	driver.implicitly_wait(10)
 	mailBox.send_keys(mailAddress)
-	config.driver.find_element_by_xpath(nextButtonXPath).click()
-	config.driver.implicitly_wait(10)
+	driver.find_element_by_xpath(nextButtonXPath).click()
+	driver.implicitly_wait(10)
 	time.sleep(2)
 	print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + color.BOLD + 'Entering password' + color.END)
-	passwordBox = config.driver.find_element_by_xpath(enterPasswordBoxXPath)
-	config.driver.implicitly_wait(10)
+	passwordBox = driver.find_element_by_xpath(enterPasswordBoxXPath)
+	driver.implicitly_wait(10)
 	passwordBox.send_keys(password)
-	config.driver.find_element_by_xpath(passwordNextButtonXPath).click()
-	config.driver.implicitly_wait(10)
+	driver.find_element_by_xpath(passwordNextButtonXPath).click()
+	driver.implicitly_wait(10)
 	time.sleep(2)
 	loadingAnimation(seconds = 10)
 	discordAndPrint('Login Successful')
@@ -905,7 +875,6 @@ def waitUntilClassEnds(presentClass):
 					break
 				messageFromDiscord = fetchDataFromJSON('log.json')
 				messageFromDiscord = messageFromDiscord["log"]["messageToSendFromDiscordToMeet"]
-				sendMessageInChatBox(messageFromDiscord, True)
 				if abortBotIfTriggered():
 					break
 			except Exception as e:
@@ -1058,3 +1027,27 @@ def googlemeetbotFunction():
 		revertTimeTable()
 
 		console.print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + "Attened all classes successfully!", style = "BLINK2 bold red")
+
+# used to login to gmail 
+# we use this only once while setting chrome profile
+def login(mailAddress, password):
+	pathToChromeDriver = data['dir']['pathToChromeDriver']
+	driver = webdriver.Chrome(options = chromeOptions, executable_path = pathToChromeDriver)
+	driver.maximize_window()
+	print('Logging into ' + color.BOLD + 'Google account' + color.END)
+	driver.get('https://accounts.google.com/servicelogin')
+	print('Entering mail address')
+	mailBox = driver.find_element_by_xpath(mailBoxXPath)
+	driver.implicitly_wait(10)
+	mailBox.send_keys(mailAddress)
+	driver.save_screenshot("image.png")
+	driver.find_element_by_xpath(nextButtonXPath).click()
+	driver.implicitly_wait(10)
+	print(color.BOLD + 'Entering password' + color.END)
+	passwordBox = driver.find_element_by_xpath(enterPasswordBoxXPath)
+	driver.implicitly_wait(10)
+	passwordBox.send_keys(password)
+	driver.find_element_by_xpath(passwordNextButtonXPath).click()
+	driver.implicitly_wait(10)
+	print('Login Successful')
+	return driver

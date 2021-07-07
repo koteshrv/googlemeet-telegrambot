@@ -1,2 +1,3 @@
-PATH = 'C:\\googlemeetbot\\'
+PATH = '/home/koteshrv/Desktop/googlemeetbot/'
 driver = None
+

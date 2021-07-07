@@ -1,9 +1,7 @@
+#!/usr/bin/python3
 from dependencies import *
 
 argLen = len(sys.argv)
-
-# rich console
-console = Console()
 
 try:
 	if argLen == 1:
@@ -12,13 +10,14 @@ try:
 
 	elif argLen == 2:
 		arg = sys.argv[1].lower()
-		# loads the timetable and prints todays timetable
-		if arg == '--t':
+
+		# loads the timetable and prints today's timetable
+		if arg == '--t' or arg == "timetable":
 			loadTimeTable()
 			classesToday(printTable = True)
 
 		# uses class url to join the class immediately
-		elif arg == '--l':
+		elif arg == '--l' or arg == "join":
 			setStatus("discordServer", False)
 			print(text2art("googlemeetbot", font = "small"))
 			classLink = input(color.BOLD + color.YELLOW + 'Enter the class link: ' + color.END)
@@ -26,12 +25,12 @@ try:
 			joinClassThread(classLink)
 
 		# prints the holidays list
-		elif arg == '--h':
+		elif arg == '--h' or arg == "holidays":
 			displayHolidaysList()
 
 		# loads the timetable and prints the current class
 		# if there is no class at the moment, then it returns "None"
-		elif arg == '--c':
+		elif arg == '--c' or arg == "whichclass":
 			print(color.CYAN + str(whichClass()) + color.END)
 
 		# prints all arguments and their uses
@@ -48,8 +47,9 @@ try:
 	elif argLen == 3:
 		arg1 = sys.argv[1].lower()
 		arg2 = sys.argv[2].lower()
+
 		# uses class url to join the class and schedules at specified 'time'
-		if arg1 == '--l':
+		if arg1 == '--l' or arg1 == "join":
 			setStatus("discordServer", False)
 			print(text2art("googlemeetbot", font = "small"))
 			hours, minutes = arg2.split(':')

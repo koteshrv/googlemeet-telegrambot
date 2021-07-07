@@ -12,8 +12,7 @@
         "TEST" : "https://classroom.google.com/c/MzA1NTIwMjU1NzQ3"
     },
     "dir": {
-        "pathToChromeDriver": "/home/koteshrv/.local/bin/chromedriver",
-        "profilePath": "/home/koteshrv/.config/google-chrome/Profile 1",
+        "profilePath": "~/.config/google-chrome",
         "classTimeTableLocation": "/home/koteshrv/Desktop/googlemeetbot/timetable.xlsx"
     },
     "otherData": {

@@ -796,7 +796,6 @@ def alertSound(frequency = True):
 # launches the chrome driver 
 def loadDriver():
 	global driver
-	pathToChromeDriver = data['dir']['pathToChromeDriver']
 	driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
 	driver.maximize_window()
 	driver.set_page_load_timeout(10)
@@ -1033,10 +1032,9 @@ def googlemeetbotFunction():
 # used to login to gmail 
 # we use this only once while setting chrome profile
 def login(mailAddress, password):
-	driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+	loadDriver()
 	driver.maximize_window()
-	print('Logging into ' + color.BOLD + 'Google account' + color.END)
-	discord('Logging into google account')
+	discordAndPrint('Logging into ' + 'Google account')
 	driver.get('https://accounts.google.com/servicelogin')
 	discordAndPrint('Entering mail address')
 	mailBox = driver.find_element_by_xpath(mailBoxXPath)
@@ -1053,4 +1051,5 @@ def login(mailAddress, password):
 	driver.find_element_by_xpath(passwordNextButtonXPath).click()
 	driver.implicitly_wait(10)
 	discordAndPrint('Login Successful')
-	return driver
+	driver.close()
+	driver.quit()

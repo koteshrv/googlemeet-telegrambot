@@ -1,6 +1,5 @@
 aiohttp==3.7.4.post0
 APScheduler==3.6.3
-apturl==0.5.2
 art==5.2
 asn1crypto==0.24.0
 async-timeout==3.0.1

@@ -64,8 +64,8 @@ chrome_options.add_experimental_option("prefs", { \
 })
 
 # classes and xpaths of google meet and google classroom elements
-mailBoxXPath = '//*[@id="identifierId"]'
-nextButtonXPath = '//*[@id="identifierNext"]'
+mailBoxXPath = '//*[@id="Email"]'
+nextButtonXPath = '//*[@id="next"]'
 enterPasswordBoxXPath = '//*[@id="password"]/div[1]/div/div[1]/input'
 passwordNextButtonXPath = '//*[@id="passwordNext"]'
 meetLinkXPath = '//*[@id="yDmH0d"]/div[4]/div[3]/div/div[1]/div/div[2]/div[2]/div/span/a'

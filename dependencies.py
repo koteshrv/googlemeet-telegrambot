@@ -47,14 +47,17 @@ profilePath = data['dir']['profilePath']
 # https://github.com/willmcgugan/rich
 console = Console()
 
-# chrome options
-chromeOptions = Options()
-chromeOptions.page_load_strategy = 'eager'
-chromeOptions.add_experimental_option('excludeSwitches', ['enable-logging'])
-chromeOptions.add_argument("--disable-extensions")
-chromeOptions.add_argument("--disable-popup-blocking")
-chromeOptions.add_argument("--user-data-dir=" + profilePath)
-chromeOptions.add_experimental_option("prefs", { \
+chrome_options = webdriver.ChromeOptions()
+chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.page_load_strategy = 'eager'
+chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+chrome_options.add_argument("--disable-extensions")
+chrome_options.add_argument("--disable-popup-blocking")
+chrome_options.add_argument("--user-data-dir=" + profilePath)
+chrome_options.add_experimental_option("prefs", { \
 "profile.default_content_setting_values.media_stream_mic": 2, # 1:allow, 2:block
 "profile.default_content_setting_values.media_stream_camera": 2,
 "profile.default_content_setting_values.geolocation": 2,
@@ -795,7 +798,7 @@ def alertSound(frequency = True):
 def loadDriver():
 	global driver
 	pathToChromeDriver = data['dir']['pathToChromeDriver']
-	driver = webdriver.Chrome(options = chromeOptions, executable_path = pathToChromeDriver)
+	driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
 	driver.maximize_window()
 	driver.set_page_load_timeout(10)
 	discordAndPrint('Driver loaded successfully!')
@@ -1032,7 +1035,7 @@ def googlemeetbotFunction():
 # we use this only once while setting chrome profile
 def login(mailAddress, password):
 	pathToChromeDriver = data['dir']['pathToChromeDriver']
-	driver = webdriver.Chrome(options = chromeOptions, executable_path = pathToChromeDriver)
+	driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
 	driver.maximize_window()
 	print('Logging into ' + color.BOLD + 'Google account' + color.END)
 	driver.get('https://accounts.google.com/servicelogin')

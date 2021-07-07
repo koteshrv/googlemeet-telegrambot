@@ -101,7 +101,7 @@ def discord(message):
 # prints text to terminal and discord
 def discordAndPrint(text):
 	discord('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + text)
-	discordAndPrint('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + text)
+	print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + text)
 
 # loading animation with text
 def loadingAnimation(text = 'Loading', seconds = 5):
@@ -1033,7 +1033,6 @@ def googlemeetbotFunction():
 # we use this only once while setting chrome profile
 def login(mailAddress, password):
 	loadDriver()
-	driver.maximize_window()
 	discordAndPrint('Logging into ' + 'Google account')
 	driver.get('https://accounts.google.com/servicelogin')
 	discordAndPrint('Entering mail address')

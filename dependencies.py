@@ -46,22 +46,16 @@ profilePath = data['dir']['profilePath']
 # https://github.com/willmcgugan/rich
 console = Console()
 
-chrome_options = webdriver.ChromeOptions()
-chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.page_load_strategy = 'eager'
-chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-chrome_options.add_argument("--disable-extensions")
-chrome_options.add_argument("--disable-popup-blocking")
-chrome_options.add_argument("--user-data-dir=" + profilePath)
-chrome_options.add_experimental_option("prefs", { \
-"profile.default_content_setting_values.media_stream_mic": 2, # 1:allow, 2:block
-"profile.default_content_setting_values.media_stream_camera": 2,
-"profile.default_content_setting_values.geolocation": 2,
-"profile.default_content_setting_values.notifications": 2
-})
+options = webdriver.ChromeOptions()
+options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+options.add_argument("--disable-infobars")
+options.add_argument("--window-size=1200,800")
+options.add_argument("user-agent='User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'")
+options.add_experimental_option("prefs", { \
+    "profile.default_content_setting_values.media_stream_mic": 2,     # 1:allow, 2:block
+    "profile.default_content_setting_values.media_stream_camera": 2,
+     "profile.default_content_setting_values.notifications": 2
+  })
 
 # classes and xpaths of google meet and google classroom elements
 mailBoxXPath = '//*[@id="Email"]'
@@ -796,7 +790,7 @@ def alertSound(frequency = True):
 # launches the chrome driver 
 def loadDriver():
 	global driver
-	driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+	driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=options)
 	driver.maximize_window()
 	driver.set_page_load_timeout(10)
 	discordAndPrint('Driver loaded successfully!')
@@ -1039,15 +1033,14 @@ def login(mailAddress, password):
 	mailBox = driver.find_element_by_xpath(mailBoxXPath)
 	driver.implicitly_wait(10)
 	mailBox.send_keys(mailAddress)
-	driver.save_screenshot("image.png")
 	driver.find_element_by_xpath(nextButtonXPath).click()
 	driver.implicitly_wait(10)
 	print(color.BOLD + 'Entering password' + color.END)
 	discord('Entering password')
-	passwordBox = driver.find_element_by_xpath(enterPasswordBoxXPath)
+	passwordBox = driver.find_element_by_xpath("//input[@class='whsOnd zHQkBf']")#find_element_by_xpath(enterPasswordBoxXPath)
 	driver.implicitly_wait(10)
 	passwordBox.send_keys(password)
-	driver.find_element_by_xpath(passwordNextButtonXPath).click()
+	driver.find_element_by_id('passwordNext').click()#find_element_by_xpath(passwordNextButtonXPath).click()
 	driver.implicitly_wait(10)
 	discordAndPrint('Login Successful')
 	driver.close()

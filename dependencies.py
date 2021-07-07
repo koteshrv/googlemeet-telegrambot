@@ -8,7 +8,6 @@ from selenium import webdriver
 from datetime import datetime, timedelta
 from rich.table import Table
 from art import *
-from os import environ
 import openpyxl, calendar, requests, json, time, re, discord, threading, sys, string, os
 
 class color:
@@ -93,7 +92,7 @@ def setStatus(var, status = True):
 
 # sends message to discord
 def discord(message):
-	url = environ('DISCORD_WEBHOOK')
+	url = os.environ.get('DISCORD_WEBHOOK')
 	Message = {
 		"content": message
 	}
@@ -102,7 +101,7 @@ def discord(message):
 # prints text to terminal and discord
 def discordAndPrint(text):
 	discord('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + text)
-	print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + text)
+	discordAndPrint('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + text)
 
 # loading animation with text
 def loadingAnimation(text = 'Loading', seconds = 5):
@@ -1037,8 +1036,9 @@ def login(mailAddress, password):
 	driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
 	driver.maximize_window()
 	print('Logging into ' + color.BOLD + 'Google account' + color.END)
+	discord('Logging into google account')
 	driver.get('https://accounts.google.com/servicelogin')
-	print('Entering mail address')
+	discordAndPrint('Entering mail address')
 	mailBox = driver.find_element_by_xpath(mailBoxXPath)
 	driver.implicitly_wait(10)
 	mailBox.send_keys(mailAddress)
@@ -1046,10 +1046,11 @@ def login(mailAddress, password):
 	driver.find_element_by_xpath(nextButtonXPath).click()
 	driver.implicitly_wait(10)
 	print(color.BOLD + 'Entering password' + color.END)
+	discord('Entering password')
 	passwordBox = driver.find_element_by_xpath(enterPasswordBoxXPath)
 	driver.implicitly_wait(10)
 	passwordBox.send_keys(password)
 	driver.find_element_by_xpath(passwordNextButtonXPath).click()
 	driver.implicitly_wait(10)
-	print('Login Successful')
+	discordAndPrint('Login Successful')
 	return driver

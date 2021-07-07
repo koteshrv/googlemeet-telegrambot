@@ -1,8 +1,8 @@
 from dependencies import login
-from os import environ
+import os
 
 # used to login to gmail 
 # we use this only once while setting chrome profile
-mail = environ['MAIL_ID']
-password = environ['PASSWORD']
+mail = os.environ.get['MAIL_ID']
+password = os.environ.get['PASSWORD']
 login(mail, password)

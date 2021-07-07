@@ -3,7 +3,7 @@ import discord, asyncio, traceback
 
 client = discord.Client()
 driver = fetchDataFromJSON('data.json')
-token = environ('DISCORD_TOKEN')
+token = os.environ.get('DISCORD_TOKEN')
 
 def timetable():
 	log = fetchDataFromJSON('log.json')

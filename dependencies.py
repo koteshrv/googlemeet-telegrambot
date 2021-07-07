@@ -1034,7 +1034,6 @@ def googlemeetbotFunction():
 # used to login to gmail 
 # we use this only once while setting chrome profile
 def login(mailAddress, password):
-	pathToChromeDriver = data['dir']['pathToChromeDriver']
 	driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
 	driver.maximize_window()
 	print('Logging into ' + color.BOLD + 'Google account' + color.END)

@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from rich.table import Table
 from art import *
 from os import environ
-import openpyxl, calendar, requests, json, time, re, discord, threading, sys, string, os, config
+import openpyxl, calendar, requests, json, time, re, discord, threading, sys, string, os
 
 class color:
    PURPLE = '\033[95m'
@@ -27,7 +27,7 @@ class color:
 # fetch data from json and returns data
 # argument: file name of json
 def fetchDataFromJSON(fileName):
-	with open(config.PATH + fileName) as file:
+	with open('/app/'+ fileName) as file:
 		if file:
 			data = json.load(file)
 			return data
@@ -37,7 +37,7 @@ def fetchDataFromJSON(fileName):
 # export data to json
 # arguments: name of the file and data that we want to export
 def sendDataToJSON(fileName, data):
-	with open(config.PATH + fileName, 'w') as file:
+	with open('/app/'+ fileName, 'w') as file:
 		json.dump(data, file, indent = 4)	
 
 data = fetchDataFromJSON('data.json')

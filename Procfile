@@ -1,3 +1,1 @@
-discordbot: python discordbot.py
-login: python login.py
-
+worker: python telegrambot.py

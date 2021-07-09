@@ -9,23 +9,25 @@
         "OOPSLAB": "https://classroom.google.com/c/MzEyMjg2NzQ5Nzc1",
         "PDSS": "https://classroom.google.com/c/MzEzMDA0MzMzODQz",
         "R&A": "https://classroom.google.com/c/MTI2NTM4NzY2NjMx",
-        "TEST" : "https://classroom.google.com/c/MzA1NTIwMjU1NzQ3"
-    },
-    "dir": {
-        "profilePath": "~/.config/google-chrome",
-        "classTimeTableLocation": "/app/timetable.xlsx"
+        "TEST" : "https://classroom.google.com/c/MzA1NTIwMjU1NzQ3",
+        "TEST2" : "https://classroom.google.com/c/MzcwMDM1OTQzMjcz",
+        "TEST3" : "https://classroom.google.com/c/MzY4MjUyNzQ2NjE0"
     },
     "otherData": {
-        "alertWords": [],
+        "alertWords": [
+            "respond",
+            "attendance",
+            "454",
+            "54",
+            "Koteswararao"
+        ],
         "minCountToJoin": 0,
-        "minCountToLeave": 1,
-        "autoReply" : 0,
-        "leaveAtTime" : 0,
-        "responseMessage": "present sir",
+        "minCountToLeave": 2,
         "linkPostedSeperatelyInAnnouncementTab": [
             "R&A",
             "CN",
-            "MPMCLAB"
+            "MPMCLAB",
+            "TEST2"
         ]
     }
 }

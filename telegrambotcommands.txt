@@ -1,0 +1,25 @@
+https://stackoverflow.com/questions/34457568/how-to-show-options-in-telegram-bot#  
+
+
+
+Add below text to telegram BotFather > /setcommands > select your bot > paste below text
+
+
+
+meet - runs googlemeetbot
+joinnow - takes meet link and joins the meet immediately
+joinlater - takes meet link and schedules the meet
+status - sends screenshot of driver instance
+kill - kills the bot
+whichclass - prints the present running class
+classestoday - prints today's classes
+timetable - prints timetable
+updatetimetable - updates timetable
+tempupdatetimetable - updates timetable temporarily
+holidays - prints holidays list
+addholiday - adds holiday to the list
+removeholiday - removes holiday from the list
+sendlog - prints log data
+help - displays all bot commands
+exitmeet - ends the current meet
+restart - restarts the bot 

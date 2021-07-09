@@ -1,0 +1,99 @@
+{
+    "holidaysList": {
+        "10": "Second Saturday"
+    },
+    "completeTimeTable": {
+        "Timings": [
+            "14:53 - 14:56",
+            "14:56 - 14:59",
+            "15:02 - 15:06",
+            "15:06 - 15:07",
+            "15:07 - 15:09",
+            "15:09 - 15:16",
+            "12:55 - 12:58"
+        ],
+        "Monday": [
+            "MPMC",
+            "CN",
+            "Java",
+            "Lunch",
+            "MWE",
+            "VLSI"
+        ],
+        "Tuesday": [
+            "VLSI",
+            "MPMC",
+            "MWE",
+            "Lunch",
+            "CN",
+            "CN",
+            "R&A"
+        ],
+        "Wednesday": [
+            "CN",
+            "Java",
+            "MPMC",
+            "TEST",
+            "TEST",
+            "TEST",
+            "TEST"
+        ],
+        "Thursday": [
+            "TEST",
+            "TEST",
+            "TEST",
+            "TEST",
+            "TEST",
+            "TEST",
+            "TEST"
+        ],
+        "Friday": [
+            "TEST",
+            "TEST2",
+            "TEST3",
+            "TEST3",
+            "TEST2",
+            "TEST"
+        ],
+        "Saturday": [
+            "TEST",
+            "MWE",
+            "Java"
+        ]
+    },
+    "todaysTimeTable": {
+        "14:53 - 14:56": "TEST",
+        "14:56 - 14:59": "TEST2",
+        "15:02 - 15:07": "TEST3",
+        "15:07 - 15:09": "TEST2",
+        "15:09 - 15:16": "TEST"
+    },
+    "log": {
+        "day": "Friday",
+        "joiningLeavingTime": {
+            "13:26 - 14:59": {
+                "joining time": "14:43:54.518114",
+                "leaving time": "14:44:35.307404"
+            },
+            "14:53 - 14:56": {
+                "joining time": "14:53:39.659092",
+                "leaving time": "14:55:31.251052"
+            },
+            "14:56 - 14:59": {
+                "joining time": "14:56:41.091936",
+                "leaving time": "14:57:29.357628"
+            },
+            "15:02 - 15:07": {
+                "joining time": "15:03:28.884818"
+            }
+        },
+        "classStatus": {
+            "13:26 - 14:59": "TEST2",
+            "14:53 - 14:56": "TEST",
+            "14:56 - 14:59": "TEST2"
+        },
+        "membersCount": null,
+        "meetAlive": false
+    },
+    "tempTimetableUpdate": {}
+}

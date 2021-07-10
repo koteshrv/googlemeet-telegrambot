@@ -5,7 +5,7 @@ herokumeetbot is a telegram bot that can be deployed on the server.  It can be u
 ## Features
 
 - Fetches class link from the google classroom from default position and from the announcement section.
-- Sends an alert message when someone called you.
+- Sends an alert message when someone calls you.
 - Auto responds in the chat section. (can be turned off if not required).
 - Joins and leaves the meet according to the members count.
 - Scheduled to attend classes everyday. 

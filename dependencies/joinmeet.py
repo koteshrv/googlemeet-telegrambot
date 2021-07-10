@@ -14,7 +14,7 @@ from dependencies import driver
 from dependencies.others import checklogin, data, sendTimetable, sendToTelegram
 from dependencies.others import (discordAndPrint, membersAlreadyJoinedCount,
 						whichClass, fetchDataFromJSON, sendDataToJSON, setStatus,
-						updateMembersCount, takeScreenshot, checkStatus)
+						updateMembersCount, takeScreenshot, checkStatus, sendMessageInChatBox)
 
 
 #classes and xpath of elements
@@ -232,6 +232,7 @@ def joinMeet(context, subject = None, URL = None, loginTime = None):
 
 		setStatus("meetAlive")
 		meetAlive = checkStatus("meetAlive")
+		autoReply = data['otherData']['autoReply']
 
 		#startRecording()
 		#discordAndPrint('Started recording successfully!')
@@ -269,6 +270,9 @@ def joinMeet(context, subject = None, URL = None, loginTime = None):
 						discordAndPrint("ALERT! Some one called you at " + str(datetime.now().time())[:8])
 						discordAndPrint(captionTextLower)
 						discordAndPrint("Triggered word: " + word)
+						if autoReply:
+							responseMessage = data['otherData']['responseMessage']
+							sendMessageInChatBox(responseMessage)
 						time.sleep(10)	
 
 				if (count < str(minCountToLeave) and flag) or (not meetAlive):

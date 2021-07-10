@@ -10,6 +10,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 import openpyxl, calendar, requests, json, time, re, sys, string, os, pickle, config
 
+chatBoxButtonXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[1]/div[3]/div/div[2]/div[3]/span/span'
+chatBoxXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div/div[2]/div[2]/div[2]/span[2]/div/div[4]/div[1]/div[1]/div[2]/textarea'
+chatSendButtonXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div/div[2]/div[2]/div[2]/span[2]/div/div[4]/div[2]/span/span'
+chatBoxCloseXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div/div[2]/div[1]/div[2]/div/span/button/i'	
+
 # fetch data from json and returns data
 # argument: file name of json
 def fetchDataFromJSON(fileName):
@@ -320,3 +325,21 @@ def sendToTelegram(context, message):
 	discordAndPrint('Sent a message successfully!')
 
 
+
+# sends the message in chat box when alert word is triggered in captions
+def sendMessageInChatBox(context, message):
+
+	config.driver.find_element_by_xpath(chatBoxButtonXPath).click()
+	config.driver.implicitly_wait(10)
+	time.sleep(1)
+	chatBox = config.driver.find_element_by_xpath(chatBoxXPath)
+	chatBox.send_keys(message)
+	time.sleep(1)
+	config.driver.find_element_by_xpath(chatSendButtonXPath).click()
+	config.driver.implicitly_wait(10)
+	time.sleep(1)
+	config.driver.find_element_by_xpath(chatBoxCloseXPath).click()
+	config.driver.implicitly_wait(10)
+	print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + 'Responded to the class by sending ' + message)
+	discordAndPrint('Responded to the class by sending ' +  message) 
+	sendToTelegram(context, 'Responded to the class by sending ' +  message)

@@ -1,5 +1,5 @@
 # herokumeetbot
-herokumeetbot is a telegram bot which can be deployed on server.  It can be used to attend google meet classes.
+herokumeetbot is a telegram bot that can be deployed on the server.  It can be used to attend google meet classes.
 
 
 ## Features

@@ -43,7 +43,8 @@ joinError = False
 
 # joins the class of given subject
 def joinMeet(subject = None, URL = None, loginTime = None):
-	checklogin()
+	if checklogin():
+		return
 	try:
 		# url or subject is given to joinClass
 		if URL == None:

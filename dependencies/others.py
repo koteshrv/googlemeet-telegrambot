@@ -301,11 +301,12 @@ def checklogin():
 		driver.get('https://apps.google.com/meet/')
 		for cookie in cookies:
 			driver.add_cookie(cookie)
+		return 0
 
 	else:
 		sendToTelegram("You're not logged in. Please run /login command to login. Then try again!")
 		Print("You're not logged in. Please run /login command in telegram to login. Then try again!")
-		return
+		return 1
 
 def takeScreenshot():
 	fileName = "status@" + str(datetime.now().strftime("%H_%M_%S")) + ".png"

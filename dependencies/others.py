@@ -43,17 +43,8 @@ def setStatus(var, status = True):
 	logData["log"][str(var)] = status
 	sendDataToJSON('log.json', logData)
 
-# sends message to discord
-def sendToDiscord(message):
-	webhook = config.DISCORD_WEBHOOK
-	Message = {
-		"content": '[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + message
-	}
-	requests.post(webhook, data = Message)
-
 # prints text to terminal and discord
 def Print(text, log = True):
-	sendToDiscord(text)
 	print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + text)
 
 # returns current day with 0 index

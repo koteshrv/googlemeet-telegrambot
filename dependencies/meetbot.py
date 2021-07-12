@@ -10,7 +10,8 @@ from dependencies.others import (checkStatus, fetchDataFromJSON, sendDataToJSON,
 
 def meetbot():
 	# checks whether user account is already logged in or not
-	checklogin()
+	if checklogin():
+		return
 
 	print(text2art("herokumeet", font = "small"))
 
@@ -54,7 +55,6 @@ def meetbot():
 		startTime = timedelta(hours = int(timings[0:2]), minutes = int(timings[3:5]))
 		endTime = timedelta(hours = int(timings[8:10]), minutes = int(timings[11:]))
 		flag = False
-		print(presentTime, startTime, endTime)
 		if presentTime < startTime: 
 			flag = True
 		# if we have a class in current time then we should add classes from now to the list

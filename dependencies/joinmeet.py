@@ -420,7 +420,7 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 			pass
 
 		driver.quit()
-
+		takeScreenshot()
 		Print('Unexpected error occurred! Fix the error ASAP and try again!')
 		Print(str(e))
 		sendToTelegram("Unexpected error occurred! Fix the error ASAP and try again!")

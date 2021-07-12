@@ -200,7 +200,6 @@ def help(update, context):
         '/joinnow - takes meet link and joins the meet immediately\n'+
         '/joinlater - takes meet link and schedules the meet\n'+
         '/status - sends screenshot of driver instance\n'+
-        '/kill - kills the bot\n'+
         '/whichclass - prints the present running class\n'+
         "/classestoday - prints today's classes\n"+
         "/timetable - prints timetable\n"+

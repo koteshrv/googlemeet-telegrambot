@@ -2,44 +2,38 @@
     "holidaysList": {},
     "completeTimeTable": {
         "Timings": [
-            "21:40 - 21:55",
-            "21:55 - 22:10",
-            "22:15 - 22:59"
+            "20:00- - 1:15",
+            "20:00- - 1:15",
+            "65:00 - 54:69"
         ],
         "Monday": [
-            "TEST2",
-            "TEST2",
-            "TEST"
+            "PC"
         ],
         "Tuesday": [
-            "VLSI",
-            "MPMC",
-            "MWE"
+            "DC"
         ],
         "Wednesday": [
-            "CN",
-            "Java",
-            "MPMC"
+            "DC"
         ],
         "Thursday": [
-            "MPMC",
-            "CN",
-            "Java"
+            "DC"
         ],
         "Friday": [
-            "MWE",
-            "MPMC",
             "DC"
         ],
         "Saturday": [
-            "VLSI",
-            "MWE",
-            "Java"
-        ]
+            "DC"
+        ],
+        "PB": [
+            "DC"
+        ],
+        "PBgds": [
+            "DC"
+        ],
+        "koti": []
     },
     "todaysTimeTable": {
-        "21:40 - 22:10": "TEST2",
-        "22:15 - 22:59": "TEST"
+        "20:00- - 1:15": "DC"
     },
     "log": {
         "day": "Monday",

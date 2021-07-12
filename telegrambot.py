@@ -1,12 +1,8 @@
-from typing import Container
-
-from urllib3.poolmanager import _default_key_normalizer
-from dependencies.others import checkStatus, sendTimetable, sendToTelegram, takeScreenshot
 from telegram.ext import CommandHandler, Job, filters
 from telegram import ChatAction
 from os import execl
 from sys import executable
-from dependencies import discordAndPrint, dp, updater, driver
+from dependencies import Print, dp, updater, driver
 from dependencies.login import login
 from dependencies.meetbot import meetbot
 from meetschedule import dailySchedule
@@ -14,8 +10,9 @@ from dependencies.joinmeet import joinMeet, endButtonXPath
 from dependencies.others import (setStatus, whichClass, loadTimeTable, fetchDataFromJSON,
                                 classesToday, updateholidaysList, updateTimeTable,
                                 sendDataToJSON, printLog, sendMessageInChatBox,
-                                sendTimetable)
-import os, config, threading, time
+                                sendTimetable, pageSource, sendToTelegram, takeScreenshot, 
+                                checkStatus)
+import os, config, threading, time, codecs
 from telegram.ext import (
     Updater,
     Filters,
@@ -64,7 +61,7 @@ def restart(update, context):
 def exitmeet(update, context):
     if not checkStatus('meetAlive'):
         sendToTelegram('No meet is going on at the movement')
-        discordAndPrint('No meet is going on at the movement')
+        Print('No meet is going on at the movement')
 
     setStatus("meetAlive", False)
 
@@ -156,6 +153,12 @@ def removeholiday(update, context):
 def updatetimetable(update, context):
     arguments = update.message.text.split()
     day, classTime, classToUpdate = arguments[-3], arguments[-2], arguments[-1]
+
+    # updating time
+    if classToUpdate[0].isnumeric():
+        print(classToUpdate)
+        classToUpdate = classToUpdate[:5] + ' - ' + classToUpdate[6:]
+
     updateTimeTable(day, classTime, classToUpdate)
     loadTimeTable()
     sendToTelegram('Updated timetable successfully!')
@@ -163,7 +166,7 @@ def updatetimetable(update, context):
 
 def tempupdatetimetable(update, context):
     arguments = update.message.text.split()
-    day, classTime, classToUpdate = arguments[-3], arguments[-2], arguments[-1]
+    day, classTime, classToUpdate = arguments[-3], arguments[-2], arguments[-1] 
 
     log = fetchDataFromJSON('log.json')
     tempTimetableUpdateData = log["tempTimetableUpdate"]
@@ -238,12 +241,30 @@ def send(update, context):
     sendMessageInChatBox(message)
    
 def googleLogin(update, context):
-    login()
+    if len(update.message.text.split()) > 1:
+        mail, password = update.message.text.split()[1:]
+        login(mail, password)
+    else :
+        login()
 
 def logout(update, context):
-    os.remove('google.pkl')
-    sendToTelegram('Logged out successfully')
-    discordAndPrint('Logged out successfully')
+    try:
+        os.remove('google.pkl')
+        sendToTelegram('Logged out successfully')
+        Print('Logged out successfully')
+    except Exception:
+        sendToTelegram('No account found to logout')
+        Print('No account found to logout')
+
+
+def sendPageSource(update, context):
+    try:
+        pageSource()
+        sendToTelegram('Sent page source successfully!')
+        Print('Sent page source successfully!')
+    except Exception:
+        sendToTelegram('Page source not found!')
+        Print('Page source not found!')
 
 
 def main():    
@@ -267,6 +288,7 @@ def main():
     dp.add_handler(CommandHandler("reply", reply, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("send", send, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("logout", logout, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
+    dp.add_handler(CommandHandler("pagesource", sendPageSource, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
 
 
     unknown_handler = MessageHandler(Filters.command, unknown)
@@ -284,7 +306,7 @@ if __name__ == '__main__':
         t1.start()
     
     except Exception as e:
-        discordAndPrint(str(e))
+        Print(str(e))
 
 
     main()

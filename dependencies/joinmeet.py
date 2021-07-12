@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from art import *
 from dependencies import driver
 from dependencies.others import checklogin, data, sendTimetable, sendToTelegram
-from dependencies.others import (discordAndPrint, membersAlreadyJoinedCount,
+from dependencies.others import (Print, membersAlreadyJoinedCount,
 						whichClass, fetchDataFromJSON, sendDataToJSON, setStatus,
 						updateMembersCount, takeScreenshot, checkStatus, sendMessageInChatBox)
 
@@ -50,15 +50,15 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 			log = {}
 			subject = subject.upper()
 			url = data['classroomLinks'][subject]
-			discordAndPrint('Opening ' + subject + ' classroom in new tab')
+			Print('Opening ' + subject + ' classroom in new tab')
 			driver.get(url)
 			time.sleep(5)
-			discordAndPrint('Waiting for Google Meet link for ' + subject + ' class')
+			Print('Waiting for Google Meet link for ' + subject + ' class')
 			linkPostedSeperatelyInAnnouncementTab = data['otherData']['linkPostedSeperatelyInAnnouncementTab']
 			# checking if the subject link is posted seperately in announcement tab
 			if subject in linkPostedSeperatelyInAnnouncementTab:	
-				discordAndPrint(subject + ' class Link is posted in announcement tab')
-				discordAndPrint('So trying to fetch data from announcement tab')
+				Print(subject + ' class Link is posted in announcement tab')
+				Print('So trying to fetch data from announcement tab')
 				previousPostData = None
 				while True:
 					# from the below fetched data
@@ -71,13 +71,13 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 							announcementTabpostedDateTime = str(driver.find_element_by_xpath(dateTimeInCommentsXPath).text)
 							break
 						except Exception as e:
-							discordAndPrint('Exception occured when trying to fetch data. So trying again in 30 seconds')
-							discordAndPrint(str(e))
+							Print('Exception occured when trying to fetch data. So trying again in 30 seconds')
+							Print(str(e))
 							time.sleep(30)
 					if previousPostData != announcementTabData :
-						discordAndPrint('Fetched Data')
-						discordAndPrint(announcementTabData)
-						discordAndPrint(announcementTabpostedDateTime)
+						Print('Fetched Data')
+						Print(announcementTabData)
+						Print(announcementTabpostedDateTime)
 					previousPostData = announcementTabData
 					# fetching url from annoucement tab data
 					# until url is fetched, the page loads for every 10 seconds
@@ -85,18 +85,18 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 					# if the link is posted today it will contain time when posted
 					if not announcementTabpostedDateTime[0].isalpha():
 						if (classURL[:24] == 'https://meet.google.com/') :
-							discordAndPrint('Fetched class link from the google classroom')
-							discordAndPrint('Opening ' + classURL)
+							Print('Fetched class link from the google classroom')
+							Print('Opening ' + classURL)
 							driver.get(classURL)
 							time.sleep(5)
 							break
 						else:
-							discordAndPrint('Fetching link failed or link not posted in announcement section')
+							Print('Fetching link failed or link not posted in announcement section')
 							sendToTelegram('Fetching link failed or link not posted in announcement section')
 							return
 					else :
 						driver.refresh()
-						discordAndPrint('Waiting for Todays link. Trying again in 10 seconds')
+						Print('Waiting for Todays link. Trying again in 10 seconds')
 						time.sleep(10)
 
 			# fetches data from link posted in google classroom
@@ -106,14 +106,14 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 					classData = driver.find_element_by_class_name(meetLinkClass).text
 					classURL = re.search("(?P<url>https?://[^\s]+)", classData).group("url")
 					if classURL[:24] == 'https://meet.google.com/':
-						discordAndPrint('Fetched class link from the google classroom')
-						discordAndPrint('Opening ' + classURL)
+						Print('Fetched class link from the google classroom')
+						Print('Opening ' + classURL)
 						driver.get(classURL)
-						discordAndPrint('Opened meet link')
+						Print('Opened meet link')
 						time.sleep(5)
 				except AttributeError:
 					sendToTelegram('Meet link not available to fetch. Trying again in 10 seconds')
-					discordAndPrint('Meet link not available to fetch. Trying again in 10 seconds')
+					Print('Meet link not available to fetch. Trying again in 10 seconds')
 					driver.refresh()
 					time.sleep(10)
 
@@ -128,18 +128,18 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 				h, m, s = str(datetime.now().time()).split(':')
 				presentTime = timedelta(hours = int(h), minutes = int(m), seconds = int(float(s)))
 				timeLeftForNextClass = (timedelta(hours = int(loginTime[:2]), minutes = int(loginTime[-2:])) - presentTime).total_seconds()
-				discordAndPrint('Class is scheduled successfully. Will join the class in ' + str(timedelta(seconds = timeLeftForNextClass)))
+				Print('Class is scheduled successfully. Will join the class in ' + str(timedelta(seconds = timeLeftForNextClass)))
 				sendToTelegram('Class is scheduled successfully. Will join the class in ' + str(timedelta(seconds = timeLeftForNextClass)))
 				time.sleep(timeLeftForNextClass)
-				discordAndPrint('Opening ' + URL)
+				Print('Opening ' + URL)
 				driver.get(URL)
-				discordAndPrint('Opened meet link')
+				Print('Opened meet link')
 				time.sleep(5)
 		
 		dismissButtonPressed = False
 		try:
 			# pressing dismiss missing of permissions warning
-			discordAndPrint('Pressing dismiss button')
+			Print('Pressing dismiss button')
 			dismissButton = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, warningDismissButton)))
 			dismissButton.click()
 			time.sleep(3)
@@ -157,20 +157,20 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 			except Exception as e:
 				sendToTelegram(e)
 				sendToTelegram('Unable to turn off audio and video')
-				discordAndPrint('Unable to turn off audio and video')
+				Print('Unable to turn off audio and video')
 				return
 		
 		# fetching count of members already joined
 		# if members count is not available then is sets the  minCountToJoinConsidered to False
 		try :
 			membersCountBeforeJoiningData = driver.find_element_by_class_name(membersCountBeforeJoiningClass).text
-			discordAndPrint(str(membersCountBeforeJoiningData))
+			Print(str(membersCountBeforeJoiningData))
 			joinedMembers = membersAlreadyJoinedCount(membersCountBeforeJoiningData)
 			minCountToJoinConsidered = True
 			minCountToJoin = data['otherData']['minCountToJoin']
 
 		except NoSuchElementException:
-			discordAndPrint("Members count not available! So joining the class without considering 'minCountToJoin'")
+			Print("Members count not available! So joining the class without considering 'minCountToJoin'")
 			minCountToJoinConsidered = False
 
 		# checking for minCountToJoin to join the class
@@ -178,19 +178,19 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 			if not minCountToJoinConsidered:
 				break
 			if joinedMembers >= minCountToJoin: 
-				discordAndPrint('More than ' + str(minCountToJoin) + ' members already joined')
-				discordAndPrint('Joining the class now')
+				Print('More than ' + str(minCountToJoin) + ' members already joined')
+				Print('Joining the class now')
 				break
 			else :
 				if joinedMembers == 0:
-					discordAndPrint('No one joined. Will try for every 10 seconds')
+					Print('No one joined. Will try for every 10 seconds')
 					sendToTelegram('No one joined. Will try for every 10 seconds')
 					time.sleep(10)
 
 				else :
-					discordAndPrint('Only ' + str(joinedMembers) + ' joined')
-					discordAndPrint('Waiting for ' + str(minCountToJoin - joinedMembers) + ' more students to join the class')
-					discordAndPrint('Trying again in 10 seconds')
+					Print('Only ' + str(joinedMembers) + ' joined')
+					Print('Waiting for ' + str(minCountToJoin - joinedMembers) + ' more students to join the class')
+					Print('Trying again in 10 seconds')
 					sendToTelegram('Only ' + str(joinedMembers) + ' joined')
 					sendToTelegram('Waiting for ' + str(minCountToJoin - joinedMembers) + ' more students to join the class')
 					sendToTelegram('Trying again in 10 seconds')
@@ -209,27 +209,27 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 		except Exception as e:
 			sendToTelegram(str(e))
 			sendToTelegram('Unexcepted error occured when trying to join the class\n So join again')
-			discordAndPrint(str(e))
-			discordAndPrint('Unexcepted error occured when trying to join the class\n So join again')
+			Print(str(e))
+			Print('Unexcepted error occured when trying to join the class\n So join again')
 			if URL == None:
 				joinError = True
 			return
 
 		time.sleep(10)
-		discordAndPrint('Pressing join button')
+		Print('Pressing join button')
 
 		try:
 			# waits until caption button is clickable and turn on captions
 			captionsButton = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, captionsButtonXPath)))
 			captionsButton.click()
-			discordAndPrint('Turning on captions')
+			Print('Turning on captions')
 		except:
-			discordAndPrint('Unable to turn on captions. So alert will not work :/')
+			Print('Unable to turn on captions. So alert will not work :/')
 			sendToTelegram('Unable to turn on captions. So alert will not work :/')
 
 		if URL == None:
 			# sending class joining time to discord
-			discordAndPrint("Joined " + subject + " class at " + str(datetime.now().time())[:8])
+			Print("Joined " + subject + " class at " + str(datetime.now().time())[:8])
 			sendToTelegram("Joined " + subject + " class at " + str(datetime.now().time())[:8])
 			classTime = whichClass(currentClassTime = True)[0]
 			joiningLeavingTimeDict = {}
@@ -245,7 +245,7 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 
 		else :
 			# sending class joining time to discord
-			discordAndPrint('Joined the class with ' + URL + ' successfully')
+			Print('Joined the class with ' + URL + ' successfully')
 			sendToTelegram('Joined the class with ' + URL + ' successfully')
 		
 		# counting number of students joined 
@@ -273,8 +273,8 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 				updateMembersCount(count)
 
 			except Exception as e:
-				discordAndPrint(str(e))
-				discordAndPrint('So auto exit will not work :/')
+				Print(str(e))
+				Print('So auto exit will not work :/')
 				sendToTelegram(str(e))
 				sendToTelegram('So auto exit will not work :/')
 			
@@ -295,9 +295,9 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 						sendToTelegram(captionTextLower)
 						sendToTelegram("Triggered word: " + word)
 						takeScreenshot()
-						discordAndPrint("ALERT! Some one called you at " + str(datetime.now().time())[:8])
-						discordAndPrint(captionTextLower)
-						discordAndPrint("Triggered word: " + word)
+						Print("ALERT! Some one called you at " + str(datetime.now().time())[:8])
+						Print(captionTextLower)
+						Print("Triggered word: " + word)
 						if autoReply:
 							responseMessage = data['otherData']['responseMessage']
 							sendMessageInChatBox(driver, responseMessage)	
@@ -322,13 +322,13 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 									pass
 								break
 							except Exception as e:
-								discordAndPrint(str(e))
+								Print(str(e))
 								sendToTelegram('Failed to leave the class. Help me ASAP')
-								discordAndPrint('Failed to leave the class. Help me ASAP')
+								Print('Failed to leave the class. Help me ASAP')
 						updateMembersCount(None)
 						time.sleep(5)
 						print('Left '+ subject + ' class')
-						discordAndPrint('Left the class successfully')	
+						Print('Left the class successfully')	
 						sendToTelegram('Left the class successfully')
 					else :
 						while True:
@@ -341,12 +341,12 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 									pass
 								break
 							except Exception as e:
-								discordAndPrint(str(e))
-								discordAndPrint('Failed to leave the class. Help me ASAP')
+								Print(str(e))
+								Print('Failed to leave the class. Help me ASAP')
 								sendToTelegram(str(e))
 								sendToTelegram('Failed to leave the class. Help me ASAP')
 						updateMembersCount(None)
-						discordAndPrint('Left the class successfully')	
+						Print('Left the class successfully')	
 						sendToTelegram('Left the class successfully')
 					setStatus("membersCount", None)
 					break
@@ -377,14 +377,14 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 									pass
 								break
 							except Exception as e:
-								discordAndPrint(str(e))
-								discordAndPrint('Failed to leave the class. Help me ASAP')
+								Print(str(e))
+								Print('Failed to leave the class. Help me ASAP')
 								sendToTelegram(str(e))
 								sendToTelegram('Failed to leave the class. Help me ASAP')
 						updateMembersCount(None)
 						time.sleep(5)
 						print('Left '+ subject + ' class')
-						discordAndPrint('Left the class successfully')	
+						Print('Left the class successfully')	
 						sendToTelegram('Left the class successfully')
 					else :
 						while True:
@@ -397,12 +397,12 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 									pass
 								break
 							except Exception as e:
-								discordAndPrint(str(e))
-								discordAndPrint('Failed to leave the class. Help me ASAP')
+								Print(str(e))
+								Print('Failed to leave the class. Help me ASAP')
 								sendToTelegram(str(e))
 								sendToTelegram('Failed to leave the class. Help me ASAP')
 						updateMembersCount(None)
-						discordAndPrint('Left the class successfully')	
+						Print('Left the class successfully')	
 						sendToTelegram('Left the class successfully')
 					setStatus("membersCount", None)
 					break
@@ -420,8 +420,8 @@ def joinMeet(subject = None, URL = None, loginTime = None):
 
 		driver.quit()
 
-		discordAndPrint('Unexpected error occurred! Fix the error ASAP and try again!')
-		discordAndPrint(str(e))
+		Print('Unexpected error occurred! Fix the error ASAP and try again!')
+		Print(str(e))
 		sendToTelegram("Unexpected error occurred! Fix the error ASAP and try again!")
 		sendToTelegram(str(e))
 

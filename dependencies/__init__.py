@@ -7,21 +7,13 @@ from telegram import ChatAction
 telegramBot = telegram.Bot(token = config.TELEGRAM_TOKEN)
 
 
-def sendToDiscord(message):
-	webhook = config.DISCORD_WEBHOOK
-	Message = {
-		"content": '[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + message
-	}
-	requests.post(webhook, data = Message)
-
 def sendToTelegram(message):
 	telegramBot.send_chat_action(chat_id = config.TELEGRAM_USER_ID, action = ChatAction.TYPING)
 	telegramBot.send_message(chat_id = config.TELEGRAM_USER_ID, text = message)
-	discordAndPrint('Sent a message successfully!')
+	Print('Sent a message successfully!')
 
 # prints text to terminal and discord
-def discordAndPrint(text):
-	sendToDiscord(text)
+def Print(text):
 	print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + text)
 	
 
@@ -50,7 +42,7 @@ driver = webdriver.Chrome(chrome_options = options)
 
 sendToTelegram("Hey! I'm alive :)")
 sendToTelegram('Driver loaded successfully')
-discordAndPrint('Telegram bot is alive :)')
-discordAndPrint('Driver loaded successfully')
+Print('Telegram bot is alive :)')
+Print('Driver loaded successfully')
 
 

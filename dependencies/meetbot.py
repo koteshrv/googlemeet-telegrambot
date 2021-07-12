@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from dependencies.joinmeet import joinMeet, joinError
 from dependencies.others import (checkStatus, fetchDataFromJSON, sendDataToJSON, updateholidaysList, loadTimeTable,
                            classesToday, classStatus, whichClass,
-						   revertTimeTable, checklogin, discordAndPrint, sendToTelegram, printLog)
+						   revertTimeTable, checklogin, Print, sendToTelegram, printLog)
 
 
 def meetbot():
@@ -34,7 +34,7 @@ def meetbot():
 	holidaysDict = jsonData["holidaysList"]
 	for holidayDate in holidaysDict:
 		if str(day) == holidayDate:
-			discordAndPrint('No classes today due to '+ holidaysDict[holidayDate])
+			Print('No classes today due to '+ holidaysDict[holidayDate])
 			return
 
 	loadTimeTable()
@@ -73,8 +73,8 @@ def meetbot():
 
 	# if status is true: classwork is completed for today
 	if status == True:
-		discordAndPrint('All classes attended for today')
-		sendToTelegram('discordAndPrint')
+		Print('All classes attended for today')
+		sendToTelegram('Print')
 		return
 
 	# if status will be false when current time is less than start time of college so we wait here until status becomes -1	
@@ -85,7 +85,7 @@ def meetbot():
 		start_h, start_m = map(int, timings[0][:5].split(':'))
 		h, m, s = str(datetime.now().time()).split(':')
 		timeToSleep = (timedelta(hours = start_h, minutes = start_m) - timedelta(hours = int(h), minutes = int(m), seconds = int(float(s)))).total_seconds()
-		discordAndPrint('You are early for the class. So I am sleeping for the next ' + str(timedelta(seconds = timeToSleep)))
+		Print('You are early for the class. So I am sleeping for the next ' + str(timedelta(seconds = timeToSleep)))
 		sendToTelegram('You are early for the class. So I am sleeping for the next ' + str(timedelta(seconds = timeToSleep)))
 		time.sleep(timeToSleep)
 		
@@ -109,7 +109,7 @@ def meetbot():
 				start_h, start_m = map(int, nextClass[0][:5].split(':'))
 				h, m, s = str(datetime.now().time()).split(':')
 				timeLeftForNextClass = (timedelta(hours = start_h, minutes = start_m) - timedelta(hours = int(h), minutes = int(m), seconds = int(float(s)))).total_seconds()
-				discordAndPrint('No class at the moment. Will try again in ' +  str(timedelta(seconds = timeLeftForNextClass)))
+				Print('No class at the moment. Will try again in ' +  str(timedelta(seconds = timeLeftForNextClass)))
 				sendToTelegram('No class at the moment. Will try again in ' +  str(timedelta(seconds = timeLeftForNextClass)))
 				time.sleep(timeLeftForNextClass)
 
@@ -119,7 +119,7 @@ def meetbot():
 				start_h, start_m = map(int, nextClass[0][:5].split(':'))
 				h, m, s = str(datetime.now().time()).split(':')
 				timeLeftForNextClass = (timedelta(hours = start_h, minutes = start_m) - timedelta(hours = int(h), minutes = int(m), seconds = int(float(s)))).total_seconds()		
-				discordAndPrint('Lunch Time. Will join next class in ' + str(timedelta(seconds = timeLeftForNextClass)))
+				Print('Lunch Time. Will join next class in ' + str(timedelta(seconds = timeLeftForNextClass)))
 				sendToTelegram('Lunch Time. Will join next class in ' + str(timedelta(seconds = timeLeftForNextClass)))
 				time.sleep(timeLeftForNextClass)
 
@@ -127,12 +127,12 @@ def meetbot():
 			classNow = whichClass()	
 			while classNow == None or classNow == "Lunch":
 				classNow = whichClass()
-			discordAndPrint(classNow + ' is going on at the moment')
-			discordAndPrint('Trying to join ' + classNow + ' class')
+			Print(classNow + ' is going on at the moment')
+			Print('Trying to join ' + classNow + ' class')
 			joinMeet(subject = classNow)
 			if joinError:
 				sendToTelegram('Unexcepted error occured when trying to join the class\n So stopping the operation\n To try again send /meet')
-				discordAndPrint('Unexcepted error occured when trying to join the class\n So join again')
+				Print('Unexcepted error occured when trying to join the class\n So join again')
 				return
 
 			jsonData = fetchDataFromJSON('log.json')
@@ -151,4 +151,4 @@ def meetbot():
 		# if the timetable is temporarily changed then its reverted to original 
 		revertTimeTable()
 
-		discordAndPrint("Attended all classes successfully!")
+		Print("Attended all classes successfully!")

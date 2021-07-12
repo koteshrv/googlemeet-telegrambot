@@ -8,7 +8,7 @@ from sys import executable
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-import openpyxl, calendar, requests, json, time, re, sys, string, os, pickle, config, telegram
+import openpyxl, calendar, requests, json, time, re, sys, string, os, pickle, config, telegram, codecs
 
 chatBoxXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div[2]/div[2]/div/div[4]/div/div[1]/div[2]/textarea'
 chatSendButtonXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div[2]/div[2]/div/div[4]/span/button/i'
@@ -52,7 +52,7 @@ def sendToDiscord(message):
 	requests.post(webhook, data = Message)
 
 # prints text to terminal and discord
-def discordAndPrint(text, log = True):
+def Print(text, log = True):
 	sendToDiscord(text)
 	print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + text)
 
@@ -248,20 +248,24 @@ def updateTimeTable(day, period, classToUpdate = None, previousClass = False):
 	sheet = timetablewb.active
 	day = day.lower()
 	log = fetchDataFromJSON('log.json')
-	i, val, asciiVal = 1, 2, 66
+	i, val, asciiVal = 1, 1, 66
 	rowValues, colValues, colDict = {}, {}, {}
-	for key in list(log['completeTimeTable'].keys())[1:] :
+	for key in list(log['completeTimeTable'].keys()) :
 		key = key.lower()
 		rowValues[key] = str(val)
 		colValues[key] = chr(asciiVal)
 		colDict[str(i)] = key
 		i += 1
 		asciiVal += 1	
-		val += 1	
-	
+		val += 1
+		
+	if classToUpdate == 'noclass':
+		classToUpdate = ''
+
 	prevClass =  sheet[colValues[colDict[period]] + str(rowValues[day])].value
 	sheet[colValues[colDict[period]] + str(rowValues[day])] = classToUpdate
 	timetablewb.save(classTimeTableLocation)
+	loadTimeTable()
 	if previousClass:
 		return prevClass
 	
@@ -298,18 +302,9 @@ def checklogin():
 		for cookie in cookies:
 			driver.add_cookie(cookie)
 
-		# loaded screen recorder 
-		#driver.get('file:///home/koteshrv/Desktop/googlemeetbot/screenrecord.html')
-
-		# Open a new window
-		#driver.execute_script("window.open('');")
-		
-		# Switch to the new window and open new URL
-		#driver.switch_to.window(driver.window_handles[1])
-
 	else:
 		sendToTelegram("You're not logged in. Please run /login command to login. Then try again!")
-		discordAndPrint("You're not logged in. Please run /login command in telegram to login. Then try again!")
+		Print("You're not logged in. Please run /login command in telegram to login. Then try again!")
 		return
 
 def takeScreenshot():
@@ -322,15 +317,22 @@ def takeScreenshot():
 def sendToTelegram(message):
 	telegramBot.send_chat_action(chat_id = config.TELEGRAM_USER_ID, action = ChatAction.TYPING)
 	telegramBot.send_message(chat_id = config.TELEGRAM_USER_ID, text = message)
-	discordAndPrint('Sent a message successfully!')
+	Print('Sent a message successfully!')
 
+def pageSource():
+	fileName = "pagesource@" + str(datetime.now().strftime("%H_%M_%S")) + ".html"
+	f = codecs.open(fileName, "w", "utf−8")
+	f.write(driver.page_source)
+	telegramBot.send_chat_action(chat_id = config.TELEGRAM_USER_ID, action = ChatAction.UPLOAD_DOCUMENT)
+	telegramBot.sendDocument(chat_id = config.TELEGRAM_USER_ID, document = open(fileName, 'rb'))
+	os.remove(fileName)
 
 # sends the message in chat box when alert word is triggered in captions
 def sendMessageInChatBox(message):
 
 	if not checkStatus("meetAlive"):
-		discordAndPrint('"' + message + '"' + " not sent\n")
-		discordAndPrint("Since no meet is going on at the movement")
+		Print('"' + message + '"' + " not sent\n")
+		Print("Since no meet is going on at the movement")
 		sendToTelegram('"' + message + '"' + " not sent")
 		sendToTelegram("No meet is going on at the movement")
 		return
@@ -344,5 +346,5 @@ def sendMessageInChatBox(message):
 	takeScreenshot()
 	print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + 'Responded to the class by sending ' + message)
 	
-	discordAndPrint('Responded to the class by sending ' +  message) 
+	Print('Responded to the class by sending ' +  message) 
 	sendToTelegram('Responded to the class by sending ' +  message)

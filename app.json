@@ -2,12 +2,10 @@
     "name": "herokumeet",
     "description": "A telegram bot that joins google meet without local setup",
     "repository": "https://github.com/koteshrv/herokumeet",
-    "logo": "https://i.pcmag.com/imagery/reviews/02y6SQ4hhnWGi8zjE2FlYqi-8.1615070874.fit_scale.size_760x427.jpg",
     "keywords": ["herokumeet", "selenium", "chromedriver"],
     "env": {
         "TELEGRAM_TOKEN": {
-            "description": "Telegram bot token",
-            "generator": "secret"
+            "description": "Telegram bot token"
         },
         "TELEGRAM_USER_ID": {
             "description": "Telegram user id"
@@ -16,8 +14,7 @@
             "description": "Google account mail address"
         },
         "PASSWORD" : {
-            "description": "Google account password",
-            "generator": "secret"
+            "description": "Google account password"
         }, 
         "TZ" : {
             "description" : "Timezone",

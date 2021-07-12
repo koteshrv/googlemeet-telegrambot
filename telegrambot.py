@@ -196,24 +196,85 @@ def sendlog(update, context):
 
 
 def help(update, context):
-    commands = ('/meet - runs googlemeetbot\n'+
-        '/joinnow - takes meet link and joins the meet immediately\n'+
-        '/joinlater - takes meet link and schedules the meet\n'+
-        '/status - sends screenshot of driver instance\n'+
-        '/whichclass - prints the present running class\n'+
-        "/classestoday - prints today's classes\n"+
-        "/timetable - prints timetable\n"+
-        '/updatetimetable - updates timetable\n'+
-        '/tempupdatetimetable - updates timetable temporarily\n'+
-        '/login - used to login to google account\n'
-        '/holidays - prints holidays list\n'+
-        '/addholiday - adds holiday to the list\n'+
-        '/removeholiday - removes holiday from the list\n'+
-        '/sendlog - prints log data\n'+
-        '/restart - restarts the bot\n'+
-        '/exitmeet - ends the meet immediately\n'+
-        '/reply - send a message to google meet chat. Needs confirmation\n'+
-        '/send - sends message to google meet chat that was received when /reply is used')
+    commands = '''joins all classes for today 
+/meet 
+
+takes meet link and joins the meet immediately
+arguments: meet link
+/joinnow https://meet.google.com/tkj-kdxp-cjs 
+
+takes meet link and schedules the meet
+arguments: meet link, time
+/joinlater https://meet.google.com/tkj-kdxp-cjs 18:35
+
+sends screenshot of driver instance
+/status
+
+returns present running class and None if no class is going on
+/whichclass 
+
+prints today's classes
+/classestoday
+
+prints timetable
+/timetable
+
+updates timetable
+arguments: day, period, class name
+/updatetimetable monday 2 DBMS
+the above command changes second period on monday to dbms
+we can also use updatetimetable to update timings
+/updatetimetable timings 2 10:00-10:50
+the above command changes second period timing to 10:00 - 10:50
+
+updates timetable temporarily and reverts to original timetable after the class ends
+arguments are same as updatetimetable command
+/tempupdatetimetable monday 2 DBMS 
+
+prints holidays list
+/holidays
+
+adds holiday to the list
+arguments: day and occasion(without spaces)
+/addholiday 15 Independence_day
+
+removes holiday from the list
+arguments: day
+/removeholiday 15 
+
+prints log data
+/sendlog
+
+displays all bot commands with description
+/help
+
+ends the current meet if meet is going on
+/exitmeet
+
+restarts the bot 
+/restart
+
+used to login google account
+arguments: mail and password
+this command is used to login using default mail and password
+which are given at the time of heroku deployment
+/login 
+this command is used to login using custom mail and password
+/login mail password
+
+sends a message to google meet chat. Needs confirmation 
+/reply Sending this message from telegram
+now to send "Sending this message from telegram" to google meet chat you
+should use /send
+
+sends message to google meet chat that was received when reply is used
+/send
+
+logs out google account
+/logout
+
+sends pagesource of the driver
+/pagesource '''
     sendToTelegram(commands)
 
 def meet(update, context):

@@ -2,7 +2,7 @@
     So that you dont need to login every time you use the bot'''
 
 import os, pickle, time, config
-from dependencies import driver
+from dependencies import discordAndPrint, driver
 
 def login():
 

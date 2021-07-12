@@ -8,10 +8,7 @@
         "JAVA": "https://classroom.google.com/c/MzEyMjgwNzM4NDA2",
         "OOPSLAB": "https://classroom.google.com/c/MzEyMjg2NzQ5Nzc1",
         "PDSS": "https://classroom.google.com/c/MzEzMDA0MzMzODQz",
-        "R&A": "https://classroom.google.com/c/MTI2NTM4NzY2NjMx",
-        "TEST" : "https://classroom.google.com/c/MzA1NTIwMjU1NzQ3",
-        "TEST2" : "https://classroom.google.com/c/MzcwMDM1OTQzMjcz",
-        "TEST3" : "https://classroom.google.com/c/MzY4MjUyNzQ2NjE0"
+        "R&A": "https://classroom.google.com/c/MTI2NTM4NzY2NjMx"
     },
     "otherData": {
         "alertWords": [
@@ -24,15 +21,15 @@
             "koti",
             "hod"
         ],
-        "minCountToJoin": 0,
-        "minCountToLeave": 2,
+        "minCountToJoin": 15,
+        "minCountToLeave": 30,
         "autoReply" : 0,
         "responseMessage": "yes sir",
         "linkPostedSeperatelyInAnnouncementTab": [
             "R&A",
             "CN",
-            "MPMCLAB",
-            "TEST2"
-        ]
+            "MPMCLAB"
+        ],
+        "startuptime" : "08:55"
     }
 }

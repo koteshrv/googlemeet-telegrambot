@@ -49,7 +49,13 @@
 
 ## How to start using this
 
-- First, you need to tell Telegram you want to register a Bot. To do this, send the [BotFather](https://t.me/botfather) a /newbot command. You get a token back.
+- Fork this repo and clone this repo locally.
+- In dependencies/data.json add classroom links of your subjects, change alertWords,  minCountToJoin, minCountToLeave.
+- Add subjects to linkPostedSeperatelyInAnnouncementTab if your class link is posted in announcement section.
+- Change startupTime in data.json to the time when your classes are about to start. If your classwork starts at 09:00 then set startupTime to 08:55.
+- Set auto reply to 1, if you need and change the responseMessage to your choice. 
+- Change timetable and set time format as 'HH:MM - HH:MM' and subject names in timetable and subject keys in data.json should be same.
+- You need to tell Telegram you want to register a Bot. To do this, send the [BotFather](https://t.me/botfather) a /newbot command. You get a token back.
 - (Not mandatory) Now send /setcommands to change the list of commands. Select your bot and paste the commands list from [here](https://github.com/koteshrv/herokumeet#commands)
 - Follow [this](https://stackoverflow.com/questions/32683992/find-out-my-own-user-id-for-sending-a-message-with-telegram-api#answers) procedure to get your telegram chat id.
 - That's it! Now press the deploy to heroku button below and enter the bot token, user id, mail, password and deploy it into your heroku.

@@ -1,18 +1,17 @@
-from dependencies.others import takeScreenshot
+from dependencies.others import sendToTelegram, takeScreenshot
 from dependencies import discordAndPrint, driver
 from telegram.ext import run_async
 from telegram import ChatAction
 import os, pickle, time, config
 
 run_async
-def login(update, context):
-    context.bot.send_chat_action(chat_id = config.TELEGRAM_USER_ID, action = ChatAction.TYPING)
+def login():
 
     mail = config.MAIL_ID
     password = config.PASSWORD
 
     if os.path.exists("google.pkl"):
-        context.bot.send_message(chat_id = config.TELEGRAM_USER_ID, text = "Already Logged into google account.")
+        sendToTelegram("Already Logged into google account.")
         discordAndPrint('Already Logged into google account.')
         return
     else:
@@ -25,9 +24,6 @@ def login(update, context):
         nextButton.click()
         time.sleep(7)
 
-        discordAndPrint('Sending screenshot to telegram')
-        takeScreenshot(context)
-
         passwordbox = driver.find_element_by_xpath("//input[@class='whsOnd zHQkBf']")
         discordAndPrint('Entering password')
         passwordbox.send_keys(password)
@@ -38,17 +34,16 @@ def login(update, context):
 
         if(driver.find_elements_by_xpath('//*[@id="authzenNext"]/div/button/div[2]')):
             discordAndPrint('Authentication found! Please verify')
-            context.bot.send_chat_action(chat_id = config.TELEGRAM_USER_ID, action = ChatAction.TYPING)
-            context.bot.send_message(chat_id = config.TELEGRAM_USER_ID, text = "Authentication found! Please verify")
+            sendToTelegram("Authentication found! Please verify")
             driver.find_element_by_xpath('//*[@id="authzenNext"]/div/button/div[2]').click()
             time.sleep(5)
 
             discordAndPrint('Sending screenshot to telegram')
-            takeScreenshot(context)
+            takeScreenshot()
 
         driver.get('https://apps.google.com/meet/')
         time.sleep(7)   
 
         pickle.dump(driver.get_cookies() , open("google.pkl","wb"))
-        context.bot.send_message(chat_id = config.TELEGRAM_USER_ID, text = "Successfully Logged into google account!")
+        sendToTelegram("Successfully Logged into google account!")
         discordAndPrint('Successfully Logged into google account!')

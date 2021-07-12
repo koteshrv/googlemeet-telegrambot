@@ -1,7 +1,11 @@
 from telegram.ext import Updater
 from selenium import webdriver
-import config, requests
+import config, requests, logging, telegram
 from datetime import datetime
+from telegram import ChatAction
+
+telegramBot = telegram.Bot(token = config.TELEGRAM_TOKEN)
+
 
 def sendToDiscord(message):
 	webhook = config.DISCORD_WEBHOOK
@@ -10,15 +14,27 @@ def sendToDiscord(message):
 	}
 	requests.post(webhook, data = Message)
 
+def sendToTelegram(message):
+	telegramBot.send_chat_action(chat_id = config.TELEGRAM_USER_ID, action = ChatAction.TYPING)
+	telegramBot.send_message(chat_id = config.TELEGRAM_USER_ID, text = message)
+	discordAndPrint('Sent a message successfully!')
+
 # prints text to terminal and discord
 def discordAndPrint(text):
 	sendToDiscord(text)
 	print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + text)
+	
 
-updater = Updater(token = config.TELEGRAM_TOKEN, use_context = True)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                     level=logging.INFO)
+
+
+updater = Updater(token = config.TELEGRAM_TOKEN, use_context = True, workers = 32, request_kwargs={'read_timeout': 6, 'connect_timeout': 10})
 dp = updater.dispatcher
 
+
 options = webdriver.ChromeOptions()
+options.add_argument('--no-sandbox')
 options.add_argument("--disable-infobars")
 options.add_argument("--window-size=1920,1080")
 options.add_argument("user-agent='User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'")
@@ -31,5 +47,10 @@ options.add_experimental_option("prefs", { \
 })
 
 driver = webdriver.Chrome(chrome_options = options)
+
+sendToTelegram("Hey! I'm alive :)")
+sendToTelegram('Driver loaded successfully')
+discordAndPrint('Telegram bot is alive :)')
 discordAndPrint('Driver loaded successfully')
+
 

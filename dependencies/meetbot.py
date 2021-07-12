@@ -2,17 +2,17 @@ from telegram.ext.dispatcher import run_async
 from art import *
 import time
 from datetime import datetime, timedelta
-from dependencies.joinmeet import joinMeet
-from dependencies.others import (fetchDataFromJSON, sendDataToJSON, updateholidaysList, loadTimeTable,
+from dependencies.joinmeet import joinMeet, joinError
+from dependencies.others import (checkStatus, fetchDataFromJSON, sendDataToJSON, updateholidaysList, loadTimeTable,
                            classesToday, classStatus, whichClass,
-						   revertTimeTable, checklogin, discordAndPrint)
+						   revertTimeTable, checklogin, discordAndPrint, sendToTelegram, printLog)
 
-@run_async
-def meetbot(update, context):
+
+def meetbot():
 	# checks whether user account is already logged in or not
-	checklogin(context)
+	checklogin()
 
-	print(text2art("googlemeetbot", font = "small"))
+	print(text2art("herokumeet", font = "small"))
 
 	# Checking for previous day log
 	# If previous day log is present then it's cleared
@@ -30,38 +30,40 @@ def meetbot(update, context):
 	dateAndTime = datetime.now()
 	day = dateAndTime.day
 	updateholidaysList()
-	loadTimeTable()
 	jsonData = fetchDataFromJSON('log.json')
 	holidaysDict = jsonData["holidaysList"]
-	classesTodayData = jsonData["todaysTimeTable"]
 	for holidayDate in holidaysDict:
 		if str(day) == holidayDate:
 			discordAndPrint('No classes today due to '+ holidaysDict[holidayDate])
 			return
 
+	loadTimeTable()
+	classesToday()
+	jsonData = fetchDataFromJSON('log.json')
+	classesTodayData = jsonData["todaysTimeTable"]
+
 	# todays class list from the present time
 	# for suppose if we have classes from 9:00 to 4:00 and if we run this script at 10:00 
 	# then it will consider classes from 10:00 into classList
 	classesList = []
-	flag = False
+	
 	for timings in classesTodayData:
 		# if current time is less than class start time then we should add all periods to the list
 		h, m, s = str(datetime.now().time()).split(':')
 		presentTime = timedelta(hours = int(h), minutes = int(m), seconds = int(float(s)))
 		startTime = timedelta(hours = int(timings[0:2]), minutes = int(timings[3:5]))
 		endTime = timedelta(hours = int(timings[8:10]), minutes = int(timings[11:]))
-		
+		flag = False
+		print(presentTime, startTime, endTime)
 		if presentTime < startTime: 
 			flag = True
 		# if we have a class in current time then we should add classes from now to the list
-		if presentTime > startTime and presentTime < endTime:
+		if presentTime >= startTime and presentTime < endTime:
 			flag = True
 		if flag:
-			classesList.append(timings + ' '+ classesTodayData[timings])
+			classesList.append(timings + ' ' + classesTodayData[timings])
 
 	completedClassesCount = len(classesTodayData) - len(classesList)
-
-	classesToday()
 
 	# get status for class joining
 	# if status is True: classwork is completed
@@ -72,6 +74,7 @@ def meetbot(update, context):
 	# if status is true: classwork is completed for today
 	if status == True:
 		discordAndPrint('All classes attended for today')
+		sendToTelegram('discordAndPrint')
 		return
 
 	# if status will be false when current time is less than start time of college so we wait here until status becomes -1	
@@ -83,12 +86,17 @@ def meetbot(update, context):
 		h, m, s = str(datetime.now().time()).split(':')
 		timeToSleep = (timedelta(hours = start_h, minutes = start_m) - timedelta(hours = int(h), minutes = int(m), seconds = int(float(s)))).total_seconds()
 		discordAndPrint('You are early for the class. So I am sleeping for the next ' + str(timedelta(seconds = timeToSleep)))
+		sendToTelegram('You are early for the class. So I am sleeping for the next ' + str(timedelta(seconds = timeToSleep)))
 		time.sleep(timeToSleep)
+		
 
 	# if today is not a holiday and status is -1 that is classwork is going on 
 	if status == -1 or status == False:
 		classNow = whichClass()
 		totalclassesTodayData = len(classesList)
+		print(classNow)
+		print(totalclassesTodayData)
+		print(classesList)
 
 		# joins all classes that are stored in classesList
 		for i in range(totalclassesTodayData):
@@ -102,6 +110,7 @@ def meetbot(update, context):
 				h, m, s = str(datetime.now().time()).split(':')
 				timeLeftForNextClass = (timedelta(hours = start_h, minutes = start_m) - timedelta(hours = int(h), minutes = int(m), seconds = int(float(s)))).total_seconds()
 				discordAndPrint('No class at the moment. Will try again in ' +  str(timedelta(seconds = timeLeftForNextClass)))
+				sendToTelegram('No class at the moment. Will try again in ' +  str(timedelta(seconds = timeLeftForNextClass)))
 				time.sleep(timeLeftForNextClass)
 
 			# if current class returns "Lunch" then it sleeps until next class
@@ -111,6 +120,7 @@ def meetbot(update, context):
 				h, m, s = str(datetime.now().time()).split(':')
 				timeLeftForNextClass = (timedelta(hours = start_h, minutes = start_m) - timedelta(hours = int(h), minutes = int(m), seconds = int(float(s)))).total_seconds()		
 				discordAndPrint('Lunch Time. Will join next class in ' + str(timedelta(seconds = timeLeftForNextClass)))
+				sendToTelegram('Lunch Time. Will join next class in ' + str(timedelta(seconds = timeLeftForNextClass)))
 				time.sleep(timeLeftForNextClass)
 
 			# joins current class and updates the log
@@ -119,7 +129,12 @@ def meetbot(update, context):
 				classNow = whichClass()
 			discordAndPrint(classNow + ' is going on at the moment')
 			discordAndPrint('Trying to join ' + classNow + ' class')
-			joinMeet(context, subject = classNow)
+			joinMeet(subject = classNow)
+			if joinError:
+				sendToTelegram('Unexcepted error occured when trying to join the class\n So stopping the operation\n To try again send /meet')
+				discordAndPrint('Unexcepted error occured when trying to join the class\n So join again')
+				return
+
 			jsonData = fetchDataFromJSON('log.json')
 			t = jsonData["todaysTimeTable"]
 			classTime = list(t.keys())
@@ -136,4 +151,4 @@ def meetbot(update, context):
 		# if the timetable is temporarily changed then its reverted to original 
 		revertTimeTable()
 
-		discordAndPrint("Attened all classes successfully!")
+		discordAndPrint("Attended all classes successfully!")

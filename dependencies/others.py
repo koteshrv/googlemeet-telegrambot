@@ -8,12 +8,13 @@ from sys import executable
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-import openpyxl, calendar, requests, json, time, re, sys, string, os, pickle, config
+import openpyxl, calendar, requests, json, time, re, sys, string, os, pickle, config, telegram
 
-chatBoxButtonXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[1]/div[3]/div/div[2]/div[3]/span/span'
-chatBoxXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div/div[2]/div[2]/div[2]/span[2]/div/div[4]/div[1]/div[1]/div[2]/textarea'
-chatSendButtonXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div/div[2]/div[2]/div[2]/span[2]/div/div[4]/div[2]/span/span'
-chatBoxCloseXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div/div[2]/div[1]/div[2]/div/span/button/i'	
+chatBoxXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div[2]/div[2]/div/div[4]/div/div[1]/div[2]/textarea'
+chatSendButtonXPath = '//*[@id="ow3"]/div[1]/div/div[9]/div[3]/div[4]/div[2]/div[2]/div/div[4]/span/button/i'
+
+
+telegramBot = telegram.Bot(token = config.TELEGRAM_TOKEN)
 
 # fetch data from json and returns data
 # argument: file name of json
@@ -124,17 +125,18 @@ def loadTimeTable():
 	sendDataToJSON('log.json', jsonData)
 	classesToday(printHoliday = False)
 
+
 def sendTimetable():
 	loadTimeTable()
 	log = fetchDataFromJSON('log.json')
 	timetableData = log["completeTimeTable"]
 	timings = timetableData['Timings']
-	s = '__**Time Table**__\n'
+	s = 'Time Table\n'
 	for key in timetableData:
 		if key != 'Timings':
 			datalist = timetableData[key]
 			period = 0
-			s += '__**' + key + '**__' + ':' + '\n'
+			s += key + ':' + '\n'
 			for i in range(len(datalist)):
 				s += timings[period] + ' : ' + datalist[period] + '\n'
 				period += 1
@@ -157,10 +159,10 @@ def classStatus():
 	classendTime = timedelta(hours = int(endTime[:2]), minutes = int(endTime[3:]))
 	if presentTime < classstartTime:
 		return False
-	if presentTime > classstartTime and presentTime < classendTime:	
+	if presentTime >= classstartTime and presentTime < classendTime:	
 		return -1
-	if not presentTime < classendTime:
-		return True
+	#if not presentTime <= classendTime:
+	return True
 
 # makes a schedule  for classes today and prints  
 def classesToday(printHoliday = True):
@@ -189,8 +191,6 @@ def classesToday(printHoliday = True):
 				prevClass = classesToday[i]
 		t = {classtime[i]: classes[i] for i in range(len(classtime))}
 		jsonData = fetchDataFromJSON('log.json')
-		classLoginLog = jsonData["log"]["classStatus"]
-		classesAlreadyAttended = list(classLoginLog.keys())
 		jsonData["todaysTimeTable"] = t
 		sendDataToJSON('log.json', jsonData)
 
@@ -291,7 +291,7 @@ def updateMembersCount(count):
 	sendDataToJSON('log.json', logData)
 		
 # checks whether google account is logged in or not
-def checklogin(context):
+def checklogin():
 	if os.path.exists("google.pkl"):
 		cookies = pickle.load(open("google.pkl", "rb"))
 		driver.get('https://apps.google.com/meet/')
@@ -308,38 +308,41 @@ def checklogin(context):
 		#driver.switch_to.window(driver.window_handles[1])
 
 	else:
-		context.bot.send_message(chat_id = config.TELEGRAM_USER_ID, text= "You're not logged in. Please run /login command to login. Then try again!")
+		sendToTelegram("You're not logged in. Please run /login command to login. Then try again!")
 		discordAndPrint("You're not logged in. Please run /login command in telegram to login. Then try again!")
 		return
 
-def takeScreenshot(context):
+def takeScreenshot():
 	fileName = "status@" + str(datetime.now().strftime("%H_%M_%S")) + ".png"
 	driver.save_screenshot(fileName)
-	context.bot.send_chat_action(chat_id = config.TELEGRAM_USER_ID, action = ChatAction.UPLOAD_DOCUMENT)
-	context.bot.sendDocument(chat_id = config.TELEGRAM_USER_ID, document = open(fileName, 'rb'))
+	telegramBot.send_chat_action(chat_id = config.TELEGRAM_USER_ID, action = ChatAction.UPLOAD_DOCUMENT)
+	telegramBot.sendDocument(chat_id = config.TELEGRAM_USER_ID, document = open(fileName, 'rb'))
 	os.remove(fileName)
 
-def sendToTelegram(context, message):
-	context.bot.send_chat_action(chat_id = config.TELEGRAM_USER_ID, action = ChatAction.TYPING)
-	context.bot.send_message(chat_id = config.TELEGRAM_USER_ID, text = message)
+def sendToTelegram(message):
+	telegramBot.send_chat_action(chat_id = config.TELEGRAM_USER_ID, action = ChatAction.TYPING)
+	telegramBot.send_message(chat_id = config.TELEGRAM_USER_ID, text = message)
 	discordAndPrint('Sent a message successfully!')
 
 
-
 # sends the message in chat box when alert word is triggered in captions
-def sendMessageInChatBox(context, message):
+def sendMessageInChatBox(message):
 
-	config.driver.find_element_by_xpath(chatBoxButtonXPath).click()
-	config.driver.implicitly_wait(10)
-	time.sleep(1)
-	chatBox = config.driver.find_element_by_xpath(chatBoxXPath)
+	if not checkStatus("meetAlive"):
+		discordAndPrint('"' + message + '"' + " not sent\n")
+		discordAndPrint("Since no meet is going on at the movement")
+		sendToTelegram('"' + message + '"' + " not sent")
+		sendToTelegram("No meet is going on at the movement")
+		return
+	
+	chatBox = driver.find_element_by_xpath(chatBoxXPath)
 	chatBox.send_keys(message)
+	time.sleep(2)
+	driver.find_element_by_xpath(chatSendButtonXPath).click()
+	driver.implicitly_wait(10)
 	time.sleep(1)
-	config.driver.find_element_by_xpath(chatSendButtonXPath).click()
-	config.driver.implicitly_wait(10)
-	time.sleep(1)
-	config.driver.find_element_by_xpath(chatBoxCloseXPath).click()
-	config.driver.implicitly_wait(10)
+	takeScreenshot()
 	print('[' + str(datetime.now().strftime("%H:%M:%S")) + '] ' + 'Responded to the class by sending ' + message)
+	
 	discordAndPrint('Responded to the class by sending ' +  message) 
-	sendToTelegram(context, 'Responded to the class by sending ' +  message)
+	sendToTelegram('Responded to the class by sending ' +  message)

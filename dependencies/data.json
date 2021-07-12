@@ -19,10 +19,15 @@
             "attendance",
             "454",
             "54",
-            "Koteswararao"
+            "Koteswararao",
+            "kotesh",
+            "koti",
+            "hod"
         ],
         "minCountToJoin": 0,
         "minCountToLeave": 2,
+        "autoReply" : 0,
+        "responseMessage": "yes sir",
         "linkPostedSeperatelyInAnnouncementTab": [
             "R&A",
             "CN",

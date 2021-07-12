@@ -23,3 +23,6 @@ sendlog - prints log data
 help - displays all bot commands
 exitmeet - ends the current meet
 restart - restarts the bot 
+login - used to login google account
+reply - send a message to google meet chat. Needs confirmation 
+send - sends message to google meet chat that was received when reply is used

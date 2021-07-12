@@ -1,99 +1,60 @@
 {
-    "holidaysList": {
-        "10": "Second Saturday"
-    },
+    "holidaysList": {},
     "completeTimeTable": {
         "Timings": [
-            "14:53 - 14:56",
-            "14:56 - 14:59",
-            "15:02 - 15:06",
-            "15:06 - 15:07",
-            "15:07 - 15:09",
-            "15:09 - 15:16",
-            "12:55 - 12:58"
+            "21:40 - 21:55",
+            "21:55 - 22:10",
+            "22:15 - 22:59"
         ],
         "Monday": [
-            "MPMC",
-            "CN",
-            "Java",
-            "Lunch",
-            "MWE",
-            "VLSI"
+            "TEST2",
+            "TEST2",
+            "TEST"
         ],
         "Tuesday": [
             "VLSI",
             "MPMC",
-            "MWE",
-            "Lunch",
-            "CN",
-            "CN",
-            "R&A"
+            "MWE"
         ],
         "Wednesday": [
             "CN",
             "Java",
-            "MPMC",
-            "TEST",
-            "TEST",
-            "TEST",
-            "TEST"
+            "MPMC"
         ],
         "Thursday": [
-            "TEST",
-            "TEST",
-            "TEST",
-            "TEST",
-            "TEST",
-            "TEST",
-            "TEST"
+            "MPMC",
+            "CN",
+            "Java"
         ],
         "Friday": [
-            "TEST",
-            "TEST2",
-            "TEST3",
-            "TEST3",
-            "TEST2",
-            "TEST"
+            "MWE",
+            "MPMC",
+            "DC"
         ],
         "Saturday": [
-            "TEST",
+            "VLSI",
             "MWE",
             "Java"
         ]
     },
     "todaysTimeTable": {
-        "14:53 - 14:56": "TEST",
-        "14:56 - 14:59": "TEST2",
-        "15:02 - 15:07": "TEST3",
-        "15:07 - 15:09": "TEST2",
-        "15:09 - 15:16": "TEST"
+        "21:40 - 22:10": "TEST2",
+        "22:15 - 22:59": "TEST"
     },
     "log": {
-        "day": "Friday",
+        "day": "Monday",
         "joiningLeavingTime": {
-            "13:26 - 14:59": {
-                "joining time": "14:43:54.518114",
-                "leaving time": "14:44:35.307404"
-            },
-            "14:53 - 14:56": {
-                "joining time": "14:53:39.659092",
-                "leaving time": "14:55:31.251052"
-            },
-            "14:56 - 14:59": {
-                "joining time": "14:56:41.091936",
-                "leaving time": "14:57:29.357628"
-            },
-            "15:02 - 15:07": {
-                "joining time": "15:03:28.884818"
+            "20:10 - 20:15": {
+                "joining time": "20:10:39.166738",
+                "leaving time": "20:12:44.318985"
             }
         },
         "classStatus": {
-            "13:26 - 14:59": "TEST2",
-            "14:53 - 14:56": "TEST",
-            "14:56 - 14:59": "TEST2"
+            "20:10 - 20:15": "TEST3"
         },
         "membersCount": null,
-        "meetAlive": false
+        "meetAlive": true,
+        "messageFromTelegram": ""
     },
     "tempTimetableUpdate": {}
 }

@@ -240,6 +240,11 @@ def send(update, context):
 def googleLogin(update, context):
     login()
 
+def logout(update, context):
+    os.remove('google.pkl')
+    sendToTelegram('Logged out successfully')
+    discordAndPrint('Logged out successfully')
+
 
 def main():    
     dp.add_handler(CommandHandler("meet", meet, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
@@ -261,6 +266,7 @@ def main():
     dp.add_handler(CommandHandler("help", help, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("reply", reply, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("send", send, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
+    dp.add_handler(CommandHandler("logout", logout, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
 
 
     unknown_handler = MessageHandler(Filters.command, unknown)

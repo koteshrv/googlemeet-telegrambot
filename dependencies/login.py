@@ -1,4 +1,4 @@
-from dependencies.others import sendToTelegram, takeScreenshot
+from dependencies.others import sendToTelegram, setStatus, takeScreenshot
 from dependencies import discordAndPrint, driver
 from telegram.ext import run_async
 from telegram import ChatAction
@@ -19,9 +19,7 @@ def login():
         mailBox = driver.find_element_by_id('identifierId')
         discordAndPrint('Entering mail address')
         mailBox.send_keys(mail)
-        discordAndPrint(driver.page_source)
-        takeScreenshot()
-        time.sleep(30)
+        setStatus('pageSource', driver.page_source)
         nextButton = driver.find_element_by_id('identifierNext')
         discordAndPrint('Clicking next button')
         nextButton.click()

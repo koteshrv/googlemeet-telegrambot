@@ -49,9 +49,9 @@
 
 ## How to start using this
 
-- First, you need to tell Telegram you want to register a Bot. To do this, send the [BotFather]('https://t.me/botfather') a /newbot command. You get a token back.
-- (Not mandatory) Now send /setcommands to change the list of commands. Select your bot and paste the commands list from [here](https://github.com/koteshrv/herokumeet/telegrambotcommands.txt)
-- Follow [this]('https://stackoverflow.com/questions/32683992/find-out-my-own-user-id-for-sending-a-message-with-telegram-api#answers) procedure to get your telegram chat id.
+- First, you need to tell Telegram you want to register a Bot. To do this, send the [BotFather](https://t.me/botfather) a /newbot command. You get a token back.
+- (Not mandatory) Now send /setcommands to change the list of commands. Select your bot and paste the commands list from [here](https://github.com/koteshrv/herokumeet/blob/main/telegrambotcommands.txt)
+- Follow [this](https://stackoverflow.com/questions/32683992/find-out-my-own-user-id-for-sending-a-message-with-telegram-api#answers) procedure to get your telegram chat id.
 - That's it! Now press the deploy to heroku button below and enter the bot token, user id, mail, password and deploy it into your heroku.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)

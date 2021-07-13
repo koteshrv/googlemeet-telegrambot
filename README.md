@@ -1,5 +1,5 @@
 # herokumeet
-**herokumeet** is a telegram bot that attends your online classes. It can be easily deployed on heroku with in few minutes. It can be used to join all the classes of the day automatically. It has some features like **alert** when someone called, **auto respond**,joins and leaves the class according to the **members count**, **reply** and many more. For more details see features and usage.
+**herokumeet** is a telegram bot that attends your google meet classes. It can be easily deployed on heroku with in few minutes. It can be used to join all the classes of the day automatically. It has some features like **alert** when someone called, **auto respond**,joins and leaves the class according to the **members count**, **reply** and many more. For more details see features and usage.
 
 
 ## Features

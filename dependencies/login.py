@@ -79,6 +79,7 @@ def login(mail = None, password = None):
             Print('Successfully Logged into google account!')
 
         except Exception as e:
+            pageSource()
             sendToTelegram('Unexpected error occured when trying to login to google account')
             sendToTelegram(str(e))
             Print('Unexpected error occured when trying to login to google account')

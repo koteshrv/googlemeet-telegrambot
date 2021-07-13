@@ -94,9 +94,6 @@ def meetbot():
 	if status == -1 or status == False:
 		classNow = whichClass()
 		totalclassesTodayData = len(classesList)
-		print(classNow)
-		print(totalclassesTodayData)
-		print(classesList)
 
 		# joins all classes that are stored in classesList
 		for i in range(totalclassesTodayData):

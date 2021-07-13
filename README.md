@@ -52,7 +52,7 @@ capcha - used to send capcha if asked while logging in
  
 - You need to have Python3 installed.
 - You need Heroku-CLI installed on your system. [Installation Guide Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
-- You need to have Google Chrome and [Chromedriver](https://chromedriver.storage.googleapis.com/index.html?path=91.0.4472.101/) installed and chromedriver in path.
+- You need to have Google Chrome installed and [Chromedriver](https://chromedriver.storage.googleapis.com/index.html?path=91.0.4472.101/) in path.
 
 ## How to start using this
 

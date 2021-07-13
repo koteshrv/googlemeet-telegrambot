@@ -41,6 +41,7 @@ def login(mail = None, password = None):
                         Print('Clicking next button')
                         nextButton.click()
                         flag = 1
+                        time.sleep(10)
                         break
                     time.sleep(1)
                     

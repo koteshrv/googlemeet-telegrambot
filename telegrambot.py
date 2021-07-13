@@ -301,11 +301,14 @@ def send(update, context):
     sendMessageInChatBox(message)
    
 def googleLogin(update, context):
+    sendToTelegram('Trying to login to google account')
     if len(update.message.text.split()) > 1:
         mail, password = update.message.text.split()[1:]
         login(mail, password)
     else :
         login()
+
+    sendToTelegram(os.listdir())
 
 def logout(update, context):
     try:
@@ -316,6 +319,7 @@ def logout(update, context):
         sendToTelegram('No account found to logout')
         Print('No account found to logout')
 
+    sendToTelegram(os.listdir())
 
 def sendPageSource(update, context):
     try:

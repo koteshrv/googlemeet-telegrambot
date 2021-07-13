@@ -35,7 +35,9 @@ def login(mail = None, password = None):
             signinButton = driver.find_element_by_id('passwordNext')
             Print('Clicking sign in button')
             signinButton.click()
-            time.sleep(7)
+            time.sleep(2)
+            takeScreenshot()
+            time.sleep(5)
 
             if(driver.find_elements_by_xpath('//*[@id="authzenNext"]/div/button/div[2]')):
                 Print('Authentication found! Please verify')

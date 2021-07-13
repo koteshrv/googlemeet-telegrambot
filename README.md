@@ -58,9 +58,20 @@ capcha - used to send capcha if asked while logging in
 - You need to tell Telegram you want to register a Bot. To do this, send the [BotFather](https://t.me/botfather) a /newbot command. You get a token back.
 - (Not mandatory) Now send /setcommands to change the list of commands. Select your bot and paste the commands list from [here](https://github.com/koteshrv/herokumeet#commands)
 - Follow [this](https://stackoverflow.com/questions/32683992/find-out-my-own-user-id-for-sending-a-message-with-telegram-api#answers) procedure to get your telegram chat id.
+- Push the repo to github
 - That's it! Now press the deploy to heroku button below and enter the bot token, user id, mail, password and deploy it into your heroku.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+- Now for google account login run googleMeet.py locally. This will generate google.pkl file. Dont share this file to any one. Any one can access your account with file.
+- Now run `git log --format="%H" -n 1` and save that commit id to revert back after uploading to heroku.
+- Now through Heroku-CLI login to your Heroku account. `heroku login -i`
+- Select this app in your Heroku-CLI. `heroku git:remote -a appname`
+- Add all files to `git add google.pkl -f`
+- Commit the changes `git commit -am "Added google.pkl"`
+- Push Code to Heroku `git push heroku main`
+- Now run `git reset --hard commit_id` to go back to previous build
+- That's it! You are good to go :)
 
 ## Usage
 

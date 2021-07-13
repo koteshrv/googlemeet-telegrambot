@@ -44,6 +44,7 @@ reply - send a message to google meet chat. Needs confirmation
 send - sends message to google meet chat that was received when reply is used
 logout - logs out google account
 pagesource - sends pagesource of the driver
+capcha - used to send capcha if asked while logging in
 ```
 
 ## How to start using this
@@ -140,6 +141,9 @@ sends message to google meet chat that was received when reply is used
 
 logs out google account
 /logout
+
+used to send capcha if asked while logging in
+/capcha capcha_text
 
 sends pagesource of the driver
 /pagesource 

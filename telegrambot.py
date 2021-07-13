@@ -326,6 +326,12 @@ def sendPageSource(update, context):
         sendToTelegram('Page source not found!')
         Print('Page source not found!')
 
+def sendCapcha(update, context):
+    capcha = update.message.text
+    setStatus('capcha', capcha)
+    sendToTelegram('Capcha sent successfully')
+    Print('Capcha received successfully')
+
 
 def main():    
     dp.add_handler(CommandHandler("meet", meet, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
@@ -349,6 +355,7 @@ def main():
     dp.add_handler(CommandHandler("send", send, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("logout", logout, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("pagesource", sendPageSource, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
+    dp.add_handler(CommandHandler("capcha", sendCapcha, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
 
 
     unknown_handler = MessageHandler(Filters.command, unknown)

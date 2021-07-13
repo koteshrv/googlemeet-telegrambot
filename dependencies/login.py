@@ -24,13 +24,11 @@ def login(mail = None, password = None):
             nextButton = driver.find_element_by_id('identifierNext')
             Print('Clicking next button')
             nextButton.click()
-            #time.sleep(2)
-            #pageSource()
-            takeScreenshot()
             time.sleep(5)
 
             try:
                 capcha =  mailBox = driver.find_element_by_id('ca')
+                takeScreenshot()
                 setStatus('capchaText', '')
                 sendToTelegram('Found capcha! Enter the capcha text')
                 flag = 0
@@ -47,8 +45,9 @@ def login(mail = None, password = None):
                     time.sleep(1)
                     
                 if not flag:
-                    Print('Waited for 60 seconds. Try again to login')
-                    sendToTelegram('Waited for 60 seconds. Try again to login')
+                    Print('Waited for 60 seconds. Try again with /login')
+                    sendToTelegram('Waited for 60 seconds. Try again with /login')
+                    return
 
             except Exception:
                 pass

@@ -1,5 +1,6 @@
 # herokumeet
-**herokumeet** is a telegram bot that attends your google meet classes. It can be easily deployed on heroku with in few minutes. It can be used to join all the classes of the day automatically. It has some features like **alert** when someone called, **auto respond**,joins and leaves the class according to the **members count**, **reply** and many more. For more details see features and usage.
+
+**herokumeet** is a telegram bot that attends your google meet classes. It can be easily deployed to heroku or local machine. You can schedule all the classes and it will join automatically. It has some features like **alert** when someone called, **auto respond**,joins and leaves the class according to the **members count**, **reply** and many more. For more details see features and usage.
 
 
 ## Features
@@ -46,6 +47,12 @@ logout - logs out google account
 pagesource - sends pagesource of the driver
 capcha - used to send capcha if asked while logging in
 ```
+
+## Prerequisites
+ 
+- You need to have Python3 installed.
+- You need Heroku-CLI installed on your system. [Installation Guide Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
+- You need to have Google Chrome and [Chromedriver](https://chromedriver.storage.googleapis.com/index.html?path=91.0.4472.101/) installed and chromedriver in path.
 
 ## How to start using this
 
@@ -159,3 +166,7 @@ used to send capcha if asked while logging in
 sends pagesource of the driver
 /pagesource 
 ```
+
+## Credits
+
+- [Aditya](https://github.com/1337w0rm) (His [repo](https://github.com/1337w0rm/YeetMeet) helped me to understand how to deploy this on heroku)

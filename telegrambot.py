@@ -354,7 +354,7 @@ def load(update, context):
         Print('Unexpected error occured when trying to load ' + url)
 
 def showFiles(update, context):
-    files = ' '.joins(os.listdir())
+    files = '\n'.join(os.listdir())
     sendToTelegram(files)
     Print(files)
 

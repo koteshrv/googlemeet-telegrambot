@@ -308,8 +308,6 @@ def googleLogin(update, context):
     else :
         login()
 
-    sendToTelegram(' ' .join(os.listdir()))
-
 def logout(update, context):
     try:
         os.remove('google.pkl')
@@ -319,7 +317,6 @@ def logout(update, context):
         sendToTelegram('No account found to logout')
         Print('No account found to logout')
 
-    sendToTelegram(' ' .join(os.listdir()))
 def sendPageSource(update, context):
     try:
         pageSource()

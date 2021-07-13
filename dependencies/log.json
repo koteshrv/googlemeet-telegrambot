@@ -41,7 +41,8 @@
         },
         "membersCount": null,
         "meetAlive": true,
-        "messageFromTelegram": ""
+        "messageFromTelegram": "",
+        "capcha" : ""
     },
     "tempTimetableUpdate": {}
 }

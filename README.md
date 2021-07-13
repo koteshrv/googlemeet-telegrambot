@@ -50,12 +50,6 @@ load - loads the url sent by the user
 files - returns files present in the repository
 ```
 
-## Prerequisites
- 
-- You need to have Python3 installed.
-- You need Heroku-CLI installed on your system. [Installation Guide Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
-- You need to have Google Chrome installed and [Chromedriver](https://chromedriver.storage.googleapis.com/index.html?path=91.0.4472.101/) in path.
-
 ## How to start using this
 
 - Fork this repo and clone this repo locally.
@@ -72,14 +66,15 @@ files - returns files present in the repository
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
+## If you want to deploy locally
+
+**Prerequisites**
+ 
+> You need to have Python3 installed.  
+> You need Heroku-CLI installed on your system. [Installation Guide Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)  
+> You need to have Google Chrome installed and [Chromedriver](https://chromedriver.storage.googleapis.com/index.html?path=91.0.4472.101/) in path.
+
 - Now for google account login run googleMeet.py locally. This will generate google.pkl file. Dont share this file to any one. Any one can access your account with file.
-- Now run `git log --format="%H" -n 1` and save that commit id to revert back after uploading to heroku.
-- Now through Heroku-CLI login to your Heroku account. `heroku login -i`
-- Select this app in your Heroku-CLI. `heroku git:remote -a appname`
-- Add all files to `git add google.pkl -f`
-- Commit the changes `git commit -am "Added google.pkl"`
-- Push Code to Heroku `git push heroku main`
-- Now run `git reset --hard commit_id` to go back to previous build
 - That's it! You are good to go :)
 
 ## Usage

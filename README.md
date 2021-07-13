@@ -46,6 +46,8 @@ send - sends message to google meet chat that was received when reply is used
 logout - logs out google account
 pagesource - sends pagesource of the driver
 capcha - used to send capcha if asked while logging in
+load - loads the url sent by the user
+files - returns files present in the repository
 ```
 
 ## Prerequisites
@@ -165,6 +167,15 @@ used to send capcha if asked while logging in
 
 sends pagesource of the driver
 /pagesource 
+
+used to send capcha if asked while logging in
+/capcha capcha_text
+
+loads the url sent by the user
+/load url
+
+returns files present in the repository
+/files
 ```
 
 ## Credits

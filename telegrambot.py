@@ -274,7 +274,16 @@ logs out google account
 /logout
 
 sends pagesource of the driver
-/pagesource '''
+/pagesource 
+
+used to send capcha if asked while logging in
+/capcha capcha_text
+
+loads the url sent by the user
+/load url
+
+returns files present in the repository
+/files'''
     sendToTelegram(commands)
 
 def meet(update, context):
@@ -332,6 +341,23 @@ def sendCapcha(update, context):
     sendToTelegram('Capcha sent successfully')
     Print('Capcha received successfully')
 
+def load(update, context):
+    try:
+        url = update.message.text
+        driver.load(url)
+        sendToTelegram(url + ' loaded successfully!')
+        Print(url + ' loaded successfully')
+    except Exception as e:
+        sendToTelegram(str(e))
+        sendToTelegram('Unexpected error occured when trying to load ' + url)
+        Print(str(e))
+        Print('Unexpected error occured when trying to load ' + url)
+
+def showFiles(update, context):
+    files = ' '.joins(os.listdir())
+    sendToTelegram(files)
+    Print(files)
+
 
 def main():    
     dp.add_handler(CommandHandler("meet", meet, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
@@ -356,6 +382,8 @@ def main():
     dp.add_handler(CommandHandler("logout", logout, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("pagesource", sendPageSource, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("capcha", sendCapcha, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
+    dp.add_handler(CommandHandler("load", load, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
+    dp.add_handler(CommandHandler("files", showFiles, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
 
 
     unknown_handler = MessageHandler(Filters.command, unknown)

@@ -1,4 +1,4 @@
-from dependencies.others import pageSource, sendToTelegram, setStatus, takeScreenshot
+from dependencies.others import checkStatus, pageSource, sendToTelegram, setStatus, takeScreenshot
 from dependencies import Print, driver
 from telegram.ext import run_async
 from telegram import ChatAction
@@ -24,9 +24,34 @@ def login(mail = None, password = None):
             nextButton = driver.find_element_by_id('identifierNext')
             Print('Clicking next button')
             nextButton.click()
-            pageSource()
+            #time.sleep(2)
+            #pageSource()
             takeScreenshot()
             time.sleep(5)
+
+            try:
+                capcha =  mailBox = driver.find_element_by_id('ca')
+                setStatus('capchaText', '')
+                sendToTelegram('Found capcha! Enter the capcha text')
+                flag = 0
+                for i in range(60):
+                    capchaText = checkStatus('capcha')
+                    if capchaText != '':
+                        Print('Entering capcha')
+                        capcha.send_keys(capchaText)
+                        nextButton = driver.find_element_by_id('identifierNext')
+                        Print('Clicking next button')
+                        nextButton.click()
+                        flag = 1
+                        break
+                    time.sleep(1)
+                    
+                if not flag:
+                    Print('Waited for 60 seconds. Try again to login')
+                    sendToTelegram('Waited for 60 seconds. Try again to login')
+
+            except Exception:
+                pass
 
             passwordbox = driver.find_element_by_xpath("//input[@class='whsOnd zHQkBf']")
             Print('Entering password')

@@ -176,3 +176,11 @@ returns files present in the repository
 ## Credits
 
 - [Aditya](https://github.com/1337w0rm) (His [repo](https://github.com/1337w0rm/YeetMeet) helped me to understand how to deploy this on heroku)
+
+## Task List
+
+- [x] Fetch link from google classroom
+- [x] Send alert message when someone called
+- [x] Auto reply
+- [ ] Screen record with audio
+- [ ] Upload recording to google drive

@@ -29,8 +29,8 @@ def login(mail = None, password = None):
             try:
                 capcha =  mailBox = driver.find_element_by_id('ca')
                 takeScreenshot()
-                setStatus('capchaText', '')
-                sendToTelegram('Found capcha! Enter the capcha text')
+                setStatus('capcha', '')
+                sendToTelegram('Found capcha! Enter the capcha text with /capcha capchaText')
                 flag = 0
                 for i in range(60):
                     capchaText = checkStatus('capcha')

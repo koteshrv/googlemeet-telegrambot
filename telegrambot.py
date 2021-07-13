@@ -327,7 +327,7 @@ def sendPageSource(update, context):
         Print('Page source not found!')
 
 def sendCapcha(update, context):
-    capcha = update.message.text
+    capcha = update.message.text.split()[-1]
     setStatus('capcha', capcha)
     sendToTelegram('Capcha sent successfully')
     Print('Capcha received successfully')

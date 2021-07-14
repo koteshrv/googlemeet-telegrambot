@@ -343,7 +343,7 @@ def sendCapcha(update, context):
 
 def load(update, context):
     try:
-        url = update.message.text
+        url = update.message.text.split()[-1]
         driver.load(url)
         sendToTelegram(url + ' loaded successfully!')
         Print(url + ' loaded successfully')

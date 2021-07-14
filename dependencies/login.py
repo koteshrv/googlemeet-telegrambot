@@ -26,26 +26,25 @@ def login(mail = None, password = None):
             nextButton.click()
             time.sleep(5)
 
-            try:
-                if driver.find_element_by_id('ca'):
-                    capcha = driver.find_element_by_id('ca')
-                    takeScreenshot()
-                    setStatus('capcha', '')
-                    sendToTelegram('Found capcha! Enter the capcha text with /capcha capchaText')
-                    flag = 0
-                    for i in range(60):
-                        capchaText = checkStatus('capcha')
-                        if capchaText != '':
-                            Print('Entering capcha')
-                            capcha.send_keys(capchaText)
-                            nextButton = driver.find_element_by_id('identifierNext')
-                            Print('Clicking next button')
-                            nextButton.click()
-                            flag = 1
-                            time.sleep(10)
-                            break
-                        time.sleep(1)
-                    
+            try: 
+                capcha = driver.find_element_by_xpath('//*[@id="ca"]')
+                takeScreenshot()
+                setStatus('capcha', '')
+                sendToTelegram('Found capcha! Enter the capcha text with /capcha capchaText')
+                flag = 0
+                for i in range(60):
+                    capchaText = checkStatus('capcha')
+                    if capchaText != '':
+                        Print('Entering capcha')
+                        capcha.send_keys(capchaText)
+                        nextButton = driver.find_element_by_id('identifierNext')
+                        Print('Clicking next button')
+                        nextButton.click()
+                        flag = 1
+                        time.sleep(10)
+                        break
+                    time.sleep(1)
+                
                 if not flag:
                     Print('Waited for 60 seconds. Try again with /login')
                     sendToTelegram('Waited for 60 seconds. Try again with /login')

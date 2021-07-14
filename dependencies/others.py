@@ -317,7 +317,10 @@ def pageSource():
 	f.write(driver.page_source)
 	telegramBot.send_chat_action(chat_id = config.TELEGRAM_USER_ID, action = ChatAction.UPLOAD_DOCUMENT)
 	telegramBot.sendDocument(chat_id = config.TELEGRAM_USER_ID, document = open(fileName, 'rb'))
-	os.remove(fileName)
+	files = os.listdir()
+	for file in files:
+		if file.endswith(".html"):
+			os.remove(file)
 
 # sends the message in chat box when alert word is triggered in captions
 def sendMessageInChatBox(message):

@@ -27,7 +27,7 @@ def login(mail = None, password = None):
             time.sleep(5)
 
             try: 
-                capcha = driver.find_element_by_xpath('//*[@id="ca"]')
+                capcha = driver.find_element_by_id('ca')
                 takeScreenshot()
                 setStatus('capcha', '')
                 sendToTelegram('Found capcha! Enter the capcha text with /capcha capchaText')

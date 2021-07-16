@@ -27,16 +27,17 @@ def login(mail = None, password = None):
             time.sleep(5)
 
             try: 
-                capcha = driver.find_element_by_id('ca')
+                captchaImg = driver.find_element_by_id('captchaimg')
+                captcha = driver.find_element_by_id('ca')
                 takeScreenshot()
-                setStatus('capcha', '')
-                sendToTelegram('Found capcha! Enter the capcha text with /capcha capchaText')
+                setStatus('captcha', '')
+                sendToTelegram('Found captcha! Enter the captcha text with /captcha captchaText')
                 flag = 0
                 for i in range(60):
-                    capchaText = checkStatus('capcha')
-                    if capchaText != '':
-                        Print('Entering capcha')
-                        capcha.send_keys(capchaText)
+                    captchaText = checkStatus('captcha')
+                    if captchaText != '':
+                        Print('Entering captcha')
+                        captcha.send_keys(captchaText)
                         nextButton = driver.find_element_by_id('identifierNext')
                         Print('Clicking next button')
                         nextButton.click()

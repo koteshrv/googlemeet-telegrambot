@@ -21,6 +21,7 @@ def login(mail = None, password = None):
             mailBox = driver.find_element_by_id('identifierId')
             Print('Entering mail address')
             mailBox.send_keys(mail)
+            time.sleep(5)
             nextButton = driver.find_element_by_id('identifierNext')
             Print('Clicking next button')
             nextButton.click()
@@ -29,27 +30,28 @@ def login(mail = None, password = None):
             try: 
                 captchaImg = driver.find_element_by_id('captchaimg')
                 captcha = driver.find_element_by_id('ca')
-                takeScreenshot()
-                setStatus('captcha', '')
-                sendToTelegram('Found captcha! Enter the captcha text with /captcha captchaText')
-                flag = 0
-                for i in range(60):
-                    captchaText = checkStatus('captcha')
-                    if captchaText != '':
-                        Print('Entering captcha')
-                        captcha.send_keys(captchaText)
-                        nextButton = driver.find_element_by_id('identifierNext')
-                        Print('Clicking next button')
-                        nextButton.click()
-                        flag = 1
-                        time.sleep(10)
-                        break
-                    time.sleep(1)
-                
-                if not flag:
-                    Print('Waited for 60 seconds. Try again with /login')
-                    sendToTelegram('Waited for 60 seconds. Try again with /login')
-                    return
+                if captcha.text != 'Type the text you hear or see':
+                    takeScreenshot()
+                    setStatus('captcha', '')
+                    sendToTelegram('Found captcha! Enter the captcha text with /captcha captchaText')
+                    flag = 0
+                    for i in range(60):
+                        captchaText = checkStatus('captcha')
+                        if captchaText != '':
+                            Print('Entering captcha')
+                            captcha.send_keys(captchaText)
+                            nextButton = driver.find_element_by_id('identifierNext')
+                            Print('Clicking next button')
+                            nextButton.click()
+                            flag = 1
+                            time.sleep(10)
+                            break
+                        time.sleep(1)
+                    
+                    if not flag:
+                        Print('Waited for 60 seconds. Try again with /login')
+                        sendToTelegram('Waited for 60 seconds. Try again with /login')
+                        return
 
             except Exception:
                 pass

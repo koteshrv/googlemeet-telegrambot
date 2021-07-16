@@ -42,7 +42,7 @@
         "membersCount": null,
         "meetAlive": true,
         "messageFromTelegram": "",
-        "capcha" : ""
+        "captcha" : ""
     },
     "tempTimetableUpdate": {}
 }

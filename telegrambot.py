@@ -276,8 +276,8 @@ logs out google account
 sends pagesource of the driver
 /pagesource 
 
-used to send capcha if asked while logging in
-/capcha capcha_text
+used to send captcha if asked while logging in
+/captcha captcha_text
 
 loads the url sent by the user
 /load url
@@ -335,16 +335,16 @@ def sendPageSource(update, context):
         sendToTelegram('Page source not found!')
         Print('Page source not found!')
 
-def sendCapcha(update, context):
-    capcha = update.message.text.split()[-1]
-    setStatus('capcha', capcha)
-    sendToTelegram('Capcha sent successfully')
-    Print('Capcha received successfully')
+def sendcaptcha(update, context):
+    captcha = update.message.text.split()[-1]
+    setStatus('captcha', captcha)
+    sendToTelegram('captcha sent successfully')
+    Print('captcha received successfully')
 
 def load(update, context):
     try:
         url = update.message.text.split()[-1]
-        driver.load(url)
+        driver.get(url)
         sendToTelegram(url + ' loaded successfully!')
         Print(url + ' loaded successfully')
     except Exception as e:
@@ -381,7 +381,7 @@ def main():
     dp.add_handler(CommandHandler("send", send, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("logout", logout, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("pagesource", sendPageSource, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
-    dp.add_handler(CommandHandler("capcha", sendCapcha, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
+    dp.add_handler(CommandHandler("captcha", sendcaptcha, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("load", load, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("files", showFiles, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
 

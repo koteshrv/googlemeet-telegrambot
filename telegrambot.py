@@ -3,7 +3,6 @@ from telegram import ChatAction
 from os import execl
 from sys import executable
 from dependencies import Print, dp, updater, driver
-from dependencies.login import login
 from dependencies.meetbot import meetbot
 from meetschedule import dailySchedule
 from dependencies.joinmeet import joinMeet, endButtonXPath
@@ -114,7 +113,7 @@ def addholiday(update, context):
     date, occasion = arguments[-2], arguments[-1]
     if(date.isnumeric()):
         updateholidaysList(date, occasion)
-        sendToTelegram(context, 'Added ' + str(date) + 'to the list successfully!')
+        sendToTelegram('Added ' + str(date) + 'to the list successfully!')
         log = fetchDataFromJSON('log.json')
         holidays = log["holidaysList"]
         holidaysString = '__**Holidays List**__\n'
@@ -309,23 +308,6 @@ def send(update, context):
     message = checkStatus('messageFromTelegram')
     sendMessageInChatBox(message)
    
-def googleLogin(update, context):
-    sendToTelegram('Trying to login to google account')
-    if len(update.message.text.split()) > 1:
-        mail, password = update.message.text.split()[1:]
-        login(mail, password)
-    else :
-        login()
-
-def logout(update, context):
-    try:
-        os.remove('google.pkl')
-        sendToTelegram('Logged out successfully')
-        Print('Logged out successfully')
-    except Exception:
-        sendToTelegram('No account found to logout')
-        Print('No account found to logout')
-
 def sendPageSource(update, context):
     try:
         pageSource()
@@ -335,11 +317,6 @@ def sendPageSource(update, context):
         sendToTelegram('Page source not found!')
         Print('Page source not found!')
 
-def sendcaptcha(update, context):
-    captcha = update.message.text.split()[-1]
-    setStatus('captcha', captcha)
-    sendToTelegram('captcha sent successfully')
-    Print('captcha received successfully')
 
 def load(update, context):
     try:
@@ -363,7 +340,6 @@ def main():
     dp.add_handler(CommandHandler("meet", meet, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("restart", restart, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("status", status, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
-    dp.add_handler(CommandHandler("login", googleLogin, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("joinnow", joinnow, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("joinlater", joinlater, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("exitmeet", exitmeet, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
@@ -379,9 +355,7 @@ def main():
     dp.add_handler(CommandHandler("help", help, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("reply", reply, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("send", send, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
-    dp.add_handler(CommandHandler("logout", logout, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("pagesource", sendPageSource, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
-    dp.add_handler(CommandHandler("captcha", sendcaptcha, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("load", load, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
     dp.add_handler(CommandHandler("files", showFiles, run_async = True, filters = Filters.user(user_id = int(config.TELEGRAM_USER_ID))))
 

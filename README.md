@@ -1,6 +1,6 @@
-# telegram-meet-bot
+# googlemeet-telegram-bot
 
-Telegram meet bot uses selenium to attend google meet classes. It can be easily deployed to heroku or local machine. You can schedule all the classes and it will join automatically. It has some features like alert when someone called, auto respond when alert triggers ,joins and leaves the class according to the members count, reply and many more.
+Google Meet Telegram bot uses selenium to attend google meet classes. It can be easily deployed to heroku or local machine. You can schedule all the classes and it will join automatically. It has some features like alert when someone called, auto respond when alert triggers ,joins and leaves the class according to the members count, reply and many more.
 
 ![Demo](files/demo.gif)
 

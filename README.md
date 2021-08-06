@@ -155,11 +155,6 @@ loads the url sent by the user
 returns files present in the repository
 /files
 ```
-
-## Credits
-
-- [Aditya](https://github.com/1337w0rm) (His [repo](https://github.com/1337w0rm/YeetMeet) helped me to understand how to deploy this on heroku)
-
 ## Task List
 
 - [X] Fetch link from google classroom
@@ -167,3 +162,7 @@ returns files present in the repository
 - [X] Auto reply
 - [ ] Screen record with audio
 - [ ] Upload recording to google drive
+
+## References
+
+https://github.com/1337w0rm/YeetMeet
